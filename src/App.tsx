@@ -15,6 +15,7 @@ import { BlogPage } from './pages/BlogPage';
 import { ArticleDetailPage } from './pages/ArticleDetailPage';
 import { ContactPage } from './pages/ContactPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { AdminPage } from './pages/AdminPage';
 
 import { AuthProvider } from './context/AuthContext';
 import { CurrencyProvider } from './context/CurrencyContext';
@@ -126,6 +127,12 @@ export const AppContent: React.FC = () => {
           <DashboardPage
             onStartLearning={handleStartLearning}
             onExploreCourses={() => handleNavigate('courses')}
+            onNavigate={handleNavigate}
+          />
+        )}
+
+        {currentPage === 'admin' && (
+          <AdminPage
             onNavigate={handleNavigate}
           />
         )}

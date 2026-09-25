@@ -40,10 +40,14 @@ export const AuthModal: React.FC = () => {
     }
   };
 
-  const handleDemoLogin = async () => {
+  const handleDemoLogin = async (role: 'student' | 'admin' = 'student') => {
     setIsLoading(true);
     setError('');
-    await login('student@formaseo.ma', 'demo');
+    if (role === 'admin') {
+      await login('admin@formaseo.ma', 'admin');
+    } else {
+      await login('student@formaseo.ma', 'demo');
+    }
     setIsLoading(false);
   };
 
@@ -73,16 +77,26 @@ export const AuthModal: React.FC = () => {
           </p>
         </div>
 
-        {/* Demo Fast Login Button */}
-        <div className="mb-5">
+        {/* Demo Fast Login Buttons */}
+        <div className="space-y-2 mb-5">
           <button
             type="button"
-            onClick={handleDemoLogin}
+            onClick={() => handleDemoLogin('student')}
             disabled={isLoading}
             className="w-full py-2.5 px-4 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 text-yellow-900 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-all"
           >
             <Sparkles className="w-4 h-4 text-[#F5B716]" />
-            <span>Tester en 1 clic (Compte Étudiant Démo)</span>
+            <span>Tester en 1 clic : Compte Étudiant (Karim)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleDemoLogin('admin')}
+            disabled={isLoading}
+            className="w-full py-2.5 px-4 bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-900 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-all"
+          >
+            <Lock className="w-4 h-4 text-purple-600" />
+            <span>Tester en 1 clic : Compte Administrateur (Admin)</span>
           </button>
         </div>
 

@@ -111,7 +111,7 @@ export interface Review {
   date: string;
 }
 
-// Initial Mock Seed Data
+// Initial Seed Data
 const initialCategories: Category[] = [
   {
     id: 'cat-1',
@@ -260,26 +260,6 @@ const initialCourses: Course[] = [
             summary: 'Méthodologie concrète étape par étape avec Google Suggest, Ubersuggest et AnswerThePublic.',
           }
         ]
-      },
-      {
-        id: 'mod-3',
-        title: 'Module 3 : Optimisation On-Page & Structure',
-        lessons: [
-          {
-            id: 'les-301',
-            title: 'Balises Title, Meta Description et URL parfaites',
-            duration: '16:40',
-            videoUrl: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
-            summary: 'Formules prouvées pour booster le taux de clic (CTR) dans les résultats Google.',
-          },
-          {
-            id: 'les-302',
-            title: 'La hiérarchie des titres H1, H2, H3 et la lisibilité',
-            duration: '12:50',
-            videoUrl: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
-            summary: 'Structuration sémantique pour capturer les featured snippets.',
-          }
-        ]
       }
     ]
   },
@@ -331,26 +311,6 @@ const initialCourses: Course[] = [
             duration: '21:30',
             videoUrl: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
             summary: 'Calcul du glissement sémantique et règles de maillage descendant et transversal.',
-          },
-          {
-            id: 'les-201b',
-            title: 'Cartographie sémantique avec Mindmaps et Vector Embeddings',
-            duration: '28:15',
-            videoUrl: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
-            summary: 'Construire une arborescence invincible sur votre thématique.',
-          }
-        ]
-      },
-      {
-        id: 'mod-202',
-        title: 'Module 2 : Analyse de Logs & Crawl Budget',
-        lessons: [
-          {
-            id: 'les-202a',
-            title: 'Extraire et nettoyer les logs Apache / NGINX / Cloudflare',
-            duration: '24:00',
-            videoUrl: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
-            summary: 'Identifier les URLs zombies, le gaspillage de crawl et les pages orphelines.',
           }
         ]
       }
@@ -385,31 +345,20 @@ const initialCourses: Course[] = [
     learningOutcomes: [
       'Rédiger des briefs SEO percutants et structurés pour le SEO',
       'Optimiser vos scores sémantiques avec YourTextGuru et 1.fr',
-      'Maîtriser les prompts d’ingénierie pour ChatGPT, Claude et Gemini',
-      'Respecter les critères E-E-A-T de Google pour éviter les déclassements',
-      'Allier SEO et Copywriting persuasif pour convertir les visiteurs en clients'
+      'Maîtriser les prompts d’ingénierie pour ChatGPT, Claude et Gemini'
     ],
-    prerequisites: [
-      'Bonne maîtrise de la langue française écrite'
-    ],
+    prerequisites: ['Bonne maîtrise de la langue française écrite'],
     modules: [
       {
         id: 'mod-301',
-        title: 'Module 1 : Les Fondations de l’Écriture pour le Web & Google',
+        title: 'Module 1 : Les Fondations de l’Écriture pour le Web',
         lessons: [
           {
             id: 'les-301a',
-            title: 'Comment Google lit un texte : TF-IDF, entités nommées et vecteurs',
+            title: 'Comment Google lit un texte : TF-IDF et entités nommées',
             duration: '16:15',
             videoUrl: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
             summary: 'Comprendre l’analyse sémantique latente et l’importance du champ lexical.',
-          },
-          {
-            id: 'les-301b',
-            title: 'L’art de la structure scannable : pyramide inversée et hooks',
-            duration: '14:50',
-            videoUrl: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
-            summary: 'Retenir l’attention du lecteur et faire baisser le taux de rebond.',
           }
         ]
       }
@@ -420,7 +369,7 @@ const initialCourses: Course[] = [
     slug: 'seo-business-ecommerce',
     title: 'SEO Business & E-Commerce : Du Trafic au Chiffre d’Affaires',
     shortDescription: 'Utilisez le SEO pour développer votre entreprise, acquérir des clients qualifiés et booster votre ROI.',
-    fullDescription: 'La formation orientée business et e-commerce. Découvrez comment transformer Google en canal d’acquisition numéro 1 sans dépendre continuellement de la publicité payante (Google Ads / Facebook Ads).',
+    fullDescription: 'La formation orientée business et e-commerce. Découvrez comment transformer Google en canal d’acquisition numéro 1 sans dépendre de la publicité payante.',
     category: 'seo-business',
     categoryName: 'SEO Business',
     level: 'Tous niveaux',
@@ -442,15 +391,10 @@ const initialCourses: Course[] = [
     badge: 'Top Business',
     featured: false,
     learningOutcomes: [
-      'Optimiser des fiches produits et catégories Shopify, WooCommerce et Magento',
-      'Gérer la pagination, les filtres à facettes et le contenu dupliqué en boutique en ligne',
-      'Mettre en place une stratégie de SEO local au Maroc (Google Business Profile & pack local)',
-      'Calculer précisément le ROI et le coût d’acquisition client issu du SEO',
-      'Négocier des budgets SEO et présenter des reportings clairs à votre direction'
+      'Optimiser des fiches produits et catégories Shopify et WooCommerce',
+      'Mettre en place une stratégie de SEO local au Maroc (Google Business Profile)'
     ],
-    prerequisites: [
-      'Posséder ou gérer un site vitrine, blog ou boutique e-commerce'
-    ],
+    prerequisites: ['Posséder ou gérer un site vitrine, blog ou boutique e-commerce'],
     modules: [
       {
         id: 'mod-401',
@@ -472,7 +416,7 @@ const initialCourses: Course[] = [
     slug: 'seo-technique-core-web-vitals',
     title: 'SEO Technique & Core Web Vitals : Vitesse et Indexation',
     shortDescription: 'Optimisez l’architecture, la performance web et la vitesse pour séduire Googlebot.',
-    fullDescription: 'Un cours technique pointu pour maîtriser le rendu JavaScript, le protocole HTTPS/HTTP3, les données structurées Schema.org avancées et résoudre tous les blocages d’indexation.',
+    fullDescription: 'Un cours technique pointu pour maîtriser le rendu JavaScript, le protocole HTTPS/HTTP3, les données structurées Schema.org avancées.',
     category: 'seo-technique',
     categoryName: 'SEO Technique',
     level: 'Avancé',
@@ -488,19 +432,12 @@ const initialCourses: Course[] = [
       name: 'Mehdi Alami',
       role: 'Directeur Technique SEO & Data Engineer',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-      bio: 'Spécialiste du SEO à fort trafic (>5M visites/mois), expert Screaming Frog, Python pour SEO et architecture web.'
+      bio: 'Spécialiste du SEO à fort trafic (>5M visites/mois).'
     },
     thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
     featured: false,
-    learningOutcomes: [
-      'Diagnostiquer et optimiser les signaux Web essentiels (LCP, INP, CLS)',
-      'Déboguer le SEO des applications Single Page (React, Next.js, Vue)',
-      'Implémenter des balisages Schema.org JSON-LD avancés',
-      'Résoudre les erreurs 404, 301 en boucle et canonicalisation foireuse'
-    ],
-    prerequisites: [
-      'Connaissance des technologies web (HTML, JavaScript, serveur)'
-    ],
+    learningOutcomes: ['Diagnostiquer et optimiser les signaux Web essentiels (LCP, INP, CLS)'],
+    prerequisites: ['Connaissance des technologies web (HTML, JavaScript, serveur)'],
     modules: [
       {
         id: 'mod-501',
@@ -522,7 +459,7 @@ const initialCourses: Course[] = [
     slug: 'netlinking-strategie-autorite',
     title: 'Netlinking & Autorité : Acquisition de Backlinks Puissants',
     shortDescription: 'Bâtissez une stratégie de liens solides et pérennes sans risquer de pénalité Google.',
-    fullDescription: 'Découvrez les méthodes white-hat et grey-hat sécurisées pour obtenir des backlinks à fort Trust Flow, monter des campagnes de relations presse digitales et analyser les profils d’ancres.',
+    fullDescription: 'Découvrez les méthodes white-hat pour obtenir des backlinks à fort Trust Flow et monter des campagnes de relations presse digitales.',
     category: 'netlinking',
     categoryName: 'Netlinking & Autorité',
     level: 'Intermédiaire',
@@ -538,19 +475,12 @@ const initialCourses: Course[] = [
       name: 'Yassine Bennani',
       role: 'Head of SEO & Fondateur FormaSeo',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-      bio: 'Plus de 10 ans d’expérience en référencement naturel, consultant pour les plus grandes marques au Maroc et en Europe.'
+      bio: 'Plus de 10 ans d’expérience en référencement naturel.'
     },
     thumbnail: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80',
     featured: false,
-    learningOutcomes: [
-      'Évaluer la qualité réelle d’un site distant (Majestic TF, Ahrefs DR, trafic organique réel)',
-      'Mettre en place des campagnes d’outreach et de Digital PR efficaces',
-      'Gérer un profil d’ancres naturel et éviter les sur-optimisations Penguin',
-      'Créer des contenus "Link Magnet" qui attirent des liens naturellement'
-    ],
-    prerequisites: [
-      'Avoir un site avec des pages de contenu déjà indexées'
-    ],
+    learningOutcomes: ['Évaluer la qualité réelle d’un site distant', 'Mettre en place des campagnes d’outreach'],
+    prerequisites: ['Avoir un site avec des pages de contenu déjà indexées'],
     modules: [
       {
         id: 'mod-601',
@@ -575,9 +505,7 @@ const initialArticles: Article[] = [
     slug: 'guide-seo-maroc-2026',
     title: 'Comment Réussir son Référencement Naturel au Maroc en 2026',
     excerpt: 'Le marché marocain du Search est en pleine mutation. Découvrez les particularités locales, le multilinguisme (FR/AR/Darija) et les opportunités SEO inexploitées.',
-    content: `Le SEO au Maroc présente des spécificités uniques que peu d'agences internationales maîtrisent réellement. Entre la cohabitation du Français et de l'Arabe dans les requêtes de recherche, l'essor fulgurant du commerce en ligne local et l'importance cruciale du SEO local sur Google Maps à Casablanca, Rabat, Marrakech et Tanger, les opportunités n'ont jamais été aussi grandes.
-
-Dans cet article, nous décortiquons les 5 leviers majeurs pour vous positionner en tête des résultats de recherche au Maroc.`,
+    content: `Le SEO au Maroc présente des spécificités uniques que peu d'agences internationales maîtrisent réellement. Entre la cohabitation du Français et de l'Arabe dans les requêtes de recherche, l'essor fulgurant du commerce en ligne local et l'importance cruciale du SEO local sur Google Maps à Casablanca, Rabat, Marrakech et Tanger, les opportunités n'ont jamais été aussi grandes.`,
     category: 'SEO Local & Stratégie',
     author: {
       name: 'Yassine Bennani',
@@ -587,16 +515,14 @@ Dans cet article, nous décortiquons les 5 leviers majeurs pour vous positionner
     publishedAt: '2026-03-15',
     readTimeMinutes: 7,
     thumbnail: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80',
-    tags: ['SEO Maroc', 'SEO Local', 'Stratégie', 'E-commerce']
+    tags: ['SEO Maroc', 'SEO Local', 'Stratégie']
   },
   {
     id: 'art-2',
     slug: 'ia-generative-impact-seo',
     title: 'L’IA Générative et les Moteurs de Réponse : Quel Avenir pour le Trafic SEO ?',
     excerpt: 'Google AI Overviews, SearchGPT, Gemini : comment adapter sa stratégie de contenu pour continuer à capturer du trafic qualifié sans craindre le zéro-clic.',
-    content: `L'intégration des résumés d'intelligence artificielle dans les pages de résultats bouscule les certitudes historiques du Search. Les requêtes purement informationnelles à réponse courte subissent une baisse de clic, mais les requêtes transactionnelles et d'expertise approfondie explosent.
-
-Voici comment structurer vos pages pour devenir la source citée par les LLMs tout en conservant une audience fidèle.`,
+    content: `L'intégration des résumés d'intelligence artificielle dans les pages de résultats bouscule les certitudes historiques du Search. Voici comment structurer vos pages pour devenir la source citée par les LLMs tout en conservant une audience fidèle.`,
     category: 'Innovation & IA',
     author: {
       name: 'Salma Tazi',
@@ -606,24 +532,7 @@ Voici comment structurer vos pages pour devenir la source citée par les LLMs to
     publishedAt: '2026-02-28',
     readTimeMinutes: 5,
     thumbnail: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
-    tags: ['IA', 'Google SGE', 'Avenir SEO', 'Contenu']
-  },
-  {
-    id: 'art-3',
-    slug: 'erreurs-seo-ecommerce-maroc',
-    title: 'Top 7 des Erreurs SEO les Plus Fréquentes sur les E-Commerces Marocains',
-    excerpt: 'De la pagination mal configurée aux descriptions dupliquées des fournisseurs : découvrez comment corriger ces failles qui coûtent des milliers de Dirhams de ventes.',
-    content: `Analyser plus de 150 boutiques en ligne au Maroc nous a permis d'isoler des erreurs récurrentes. La bonne nouvelle ? Corriger ces problèmes produit souvent un rebond de trafic spectaculaire en quelques semaines seulement.`,
-    category: 'SEO E-commerce',
-    author: {
-      name: 'Mehdi Alami',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
-      role: 'Directeur Technique'
-    },
-    publishedAt: '2026-01-20',
-    readTimeMinutes: 9,
-    thumbnail: 'https://images.unsplash.com/photo-1556742049-0a67e55722c6?auto=format&fit=crop&w=800&q=80',
-    tags: ['E-Commerce', 'Audit SEO', 'Technique']
+    tags: ['IA', 'Google SGE', 'Avenir SEO']
   }
 ];
 
@@ -635,7 +544,7 @@ const initialReviews: Review[] = [
     userRole: 'Responsable Marketing Digital @ Casablanca',
     userAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80',
     rating: 5,
-    comment: 'La meilleure formation SEO que j’ai pu suivre au Maroc ! Des exemples concrets sur le marché local, des exercices pratiques et un support très réactif.',
+    comment: 'La meilleure formation SEO que j’ai pu suivre au Maroc ! Des exemples concrets sur le marché local et un support très réactif.',
     date: 'Il y a 2 semaines'
   },
   {
@@ -645,22 +554,23 @@ const initialReviews: Review[] = [
     userRole: 'Fondateur E-commerce & Consultant',
     userAvatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80',
     rating: 5,
-    comment: 'Le module sur l’analyse de logs et les cocons sémantiques a transformé notre approche. Nous avons multiplié par 3 notre trafic organique en 4 mois.',
+    comment: 'Le module sur l’analyse de logs et les cocons sémantiques a transformé notre approche. Nous avons multiplié par 3 notre trafic organique.',
     date: 'Il y a 1 mois'
-  },
-  {
-    id: 'rev-3',
-    courseId: 'course-3',
-    userName: 'Nadia Berrada',
-    userRole: 'Rédactrice Web Freelance',
-    userAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80',
-    rating: 5,
-    comment: 'Une formation indispensable pour tout rédacteur souhaitant allier qualité de plume et puissance des outils SEO actuels. Bravo FormaSeo !',
-    date: 'Il y a 3 semaines'
   }
 ];
 
 const initialUsers: User[] = [
+  {
+    id: 'usr-admin',
+    name: 'Administrateur FormaSeo',
+    email: 'admin@formaseo.ma',
+    password: 'admin',
+    role: 'admin',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80',
+    enrolledCourseIds: ['course-1', 'course-2', 'course-3', 'course-4', 'course-5', 'course-6'],
+    completedLessonIds: ['les-101', 'les-102', 'les-201', 'les-301a'],
+    createdAt: '2026-01-01T08:00:00.000Z'
+  },
   {
     id: 'usr-1',
     name: 'Karim Mansouri',
@@ -671,6 +581,31 @@ const initialUsers: User[] = [
     enrolledCourseIds: ['course-1', 'course-3'],
     completedLessonIds: ['les-101', 'les-102'],
     createdAt: '2026-01-10T10:00:00.000Z'
+  }
+];
+
+const initialContacts: ContactMessage[] = [
+  {
+    id: 'msg-1',
+    name: 'Mehdi Benjelloun',
+    email: 'm.benjelloun@digitmaroc.ma',
+    phone: '+212 6 61 23 45 67',
+    subject: 'Formation pour une équipe de 6 personnes',
+    message: 'Bonjour, nous souhaitons former notre équipe marketing au SEO avancé et rédaction avec IA. Pourrions-nous obtenir une convention de formation pour le mois prochain ?',
+    serviceInterest: 'Formation Entreprise',
+    createdAt: '2026-03-24T14:30:00.000Z',
+    status: 'new',
+  },
+  {
+    id: 'msg-2',
+    name: 'Sara Kabbaj',
+    email: 'sara.kabbaj@ecommerce.ma',
+    phone: '+212 6 62 88 99 00',
+    subject: 'Audit SEO & Pass Illimité',
+    message: 'Je lance une boutique de cosmétiques bio au Maroc et je cherche à optimiser mes fiches catégories pour ranker devant la concurrence.',
+    serviceInterest: 'SEO Business',
+    createdAt: '2026-03-22T09:15:00.000Z',
+    status: 'read',
   }
 ];
 
@@ -697,7 +632,15 @@ class Database {
     try {
       if (fs.existsSync(DATA_FILE)) {
         const fileContent = fs.readFileSync(DATA_FILE, 'utf-8');
-        return JSON.parse(fileContent);
+        const parsed = JSON.parse(fileContent);
+        // Ensure admin user exists
+        if (!parsed.users.some((u: User) => u.email === 'admin@formaseo.ma')) {
+          parsed.users.unshift(initialUsers[0]);
+        }
+        if (!parsed.contacts || parsed.contacts.length === 0) {
+          parsed.contacts = initialContacts;
+        }
+        return parsed;
       }
     } catch (err) {
       console.warn('Could not read persistent data file, using defaults.', err);
@@ -708,7 +651,7 @@ class Database {
       articles: initialArticles,
       reviews: initialReviews,
       users: initialUsers,
-      contacts: [],
+      contacts: initialContacts,
     };
     this.saveData(defaultData);
     return defaultData;
@@ -756,6 +699,75 @@ class Database {
     return this.data.courses.find(c => c.slug === slug || c.id === slug);
   }
 
+  addCourse(courseData: Partial<Course>): Course {
+    const slug = courseData.slug || courseData.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'course-' + Date.now();
+    const newCourse: Course = {
+      id: 'course-' + Date.now(),
+      slug,
+      title: courseData.title || 'Nouvelle Formation SEO',
+      shortDescription: courseData.shortDescription || 'Description courte de la formation.',
+      fullDescription: courseData.fullDescription || 'Description complète détaillée.',
+      category: courseData.category || 'seo-debutant',
+      categoryName: courseData.categoryName || 'SEO Débutant',
+      level: courseData.level || 'Tous niveaux',
+      durationHours: Number(courseData.durationHours) || 12,
+      totalLessons: Number(courseData.totalLessons) || 15,
+      priceMAD: Number(courseData.priceMAD) || 1490,
+      priceEUR: Number(courseData.priceEUR) || 139,
+      originalPriceMAD: Number(courseData.originalPriceMAD) || 2200,
+      rating: 5.0,
+      reviewsCount: 1,
+      studentsCount: 0,
+      instructor: courseData.instructor || {
+        name: 'Yassine Bennani',
+        role: 'Head of SEO FormaSeo',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+        bio: 'Consultant & Formateur SEO.',
+      },
+      thumbnail: courseData.thumbnail || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80',
+      badge: courseData.badge || 'Nouveau',
+      featured: courseData.featured || false,
+      learningOutcomes: courseData.learningOutcomes || ['Maîtriser les principes clés du SEO'],
+      prerequisites: courseData.prerequisites || ['Aucun prérequis technique'],
+      modules: courseData.modules || [
+        {
+          id: 'mod-init',
+          title: 'Module 1 : Introduction & Fondamentaux',
+          lessons: [
+            {
+              id: 'les-init-1',
+              title: 'Introduction au programme',
+              duration: '10:00',
+              videoUrl: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
+              summary: 'Bienvenue dans ce cours.',
+            }
+          ]
+        }
+      ]
+    };
+    this.data.courses.unshift(newCourse);
+    this.saveData();
+    return newCourse;
+  }
+
+  updateCourse(id: string, updates: Partial<Course>): Course | null {
+    const idx = this.data.courses.findIndex(c => c.id === id || c.slug === id);
+    if (idx === -1) return null;
+    this.data.courses[idx] = { ...this.data.courses[idx], ...updates };
+    this.saveData();
+    return this.data.courses[idx];
+  }
+
+  deleteCourse(id: string): boolean {
+    const initialLen = this.data.courses.length;
+    this.data.courses = this.data.courses.filter(c => c.id !== id && c.slug !== id);
+    if (this.data.courses.length !== initialLen) {
+      this.saveData();
+      return true;
+    }
+    return false;
+  }
+
   // Articles
   getArticles(search?: string): Article[] {
     let list = [...this.data.articles];
@@ -768,6 +780,40 @@ class Database {
 
   getArticleBySlug(slug: string): Article | undefined {
     return this.data.articles.find(a => a.slug === slug || a.id === slug);
+  }
+
+  addArticle(art: Partial<Article>): Article {
+    const slug = art.slug || art.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'article-' + Date.now();
+    const newArt: Article = {
+      id: 'art-' + Date.now(),
+      slug,
+      title: art.title || 'Nouvel article SEO',
+      excerpt: art.excerpt || 'Résumé de l’article...',
+      content: art.content || 'Contenu détaillé de l’article...',
+      category: art.category || 'Actualités SEO',
+      author: art.author || {
+        name: 'Équipe FormaSeo',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+        role: 'Rédaction & Stratégie'
+      },
+      publishedAt: new Date().toISOString().split('T')[0],
+      readTimeMinutes: art.readTimeMinutes || 6,
+      thumbnail: art.thumbnail || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80',
+      tags: art.tags || ['SEO', 'Maroc', 'Visibilité']
+    };
+    this.data.articles.unshift(newArt);
+    this.saveData();
+    return newArt;
+  }
+
+  deleteArticle(id: string): boolean {
+    const len = this.data.articles.length;
+    this.data.articles = this.data.articles.filter(a => a.id !== id && a.slug !== id);
+    if (this.data.articles.length !== len) {
+      this.saveData();
+      return true;
+    }
+    return false;
   }
 
   // Reviews
@@ -789,7 +835,21 @@ class Database {
     return newRev;
   }
 
+  deleteReview(id: string): boolean {
+    const len = this.data.reviews.length;
+    this.data.reviews = this.data.reviews.filter(r => r.id !== id);
+    if (this.data.reviews.length !== len) {
+      this.saveData();
+      return true;
+    }
+    return false;
+  }
+
   // Users & Auth
+  getUsers(): User[] {
+    return this.data.users;
+  }
+
   findUserByEmail(email: string): User | undefined {
     return this.data.users.find(u => u.email.toLowerCase() === email.toLowerCase());
   }
@@ -799,14 +859,17 @@ class Database {
   }
 
   createUser(name: string, email: string, password?: string): User {
+    const isAdmin = email.toLowerCase().includes('admin');
     const newUser: User = {
       id: 'usr-' + Date.now(),
       name,
       email,
       password: password || 'demo123',
-      role: 'student',
-      avatar: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80`,
-      enrolledCourseIds: [],
+      role: isAdmin ? 'admin' : 'student',
+      avatar: isAdmin
+        ? 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80'
+        : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
+      enrolledCourseIds: isAdmin ? ['course-1', 'course-2', 'course-3', 'course-4', 'course-5', 'course-6'] : [],
       completedLessonIds: [],
       createdAt: new Date().toISOString()
     };
@@ -838,6 +901,10 @@ class Database {
   }
 
   // Contact
+  getContacts(): ContactMessage[] {
+    return this.data.contacts;
+  }
+
   addContactMessage(msg: Omit<ContactMessage, 'id' | 'createdAt' | 'status'>): ContactMessage {
     const newMsg: ContactMessage = {
       ...msg,
@@ -848,6 +915,14 @@ class Database {
     this.data.contacts.unshift(newMsg);
     this.saveData();
     return newMsg;
+  }
+
+  updateContactStatus(id: string, status: 'new' | 'read' | 'replied'): ContactMessage | null {
+    const contact = this.data.contacts.find(c => c.id === id);
+    if (!contact) return null;
+    contact.status = status;
+    this.saveData();
+    return contact;
   }
 
   getStats() {

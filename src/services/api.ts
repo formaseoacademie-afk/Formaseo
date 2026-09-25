@@ -201,4 +201,120 @@ export const api = {
       };
     }
   },
+
+  // Admin APIs
+  async getAdminOverview() {
+    try {
+      const res = await fetch(`${API_BASE}/admin/overview`);
+      const data = await res.json();
+      return data.data;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  async getAdminContacts() {
+    try {
+      const res = await fetch(`${API_BASE}/admin/contacts`);
+      const data = await res.json();
+      return data.data || [];
+    } catch (e) {
+      return [];
+    }
+  },
+
+  async updateContactStatus(id: string, status: string) {
+    try {
+      const res = await fetch(`${API_BASE}/admin/contacts/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      return await res.json();
+    } catch (e) {
+      return { success: false };
+    }
+  },
+
+  async getAdminUsers(): Promise<User[]> {
+    try {
+      const res = await fetch(`${API_BASE}/admin/users`);
+      const data = await res.json();
+      return data.data || [];
+    } catch (e) {
+      return [];
+    }
+  },
+
+  async createCourse(courseData: any): Promise<Course | null> {
+    try {
+      const res = await fetch(`${API_BASE}/admin/courses`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(courseData),
+      });
+      const data = await res.json();
+      return data.data;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  async updateCourse(id: string, courseData: any): Promise<Course | null> {
+    try {
+      const res = await fetch(`${API_BASE}/admin/courses/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(courseData),
+      });
+      const data = await res.json();
+      return data.data;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  async deleteCourse(id: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/admin/courses/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      return data.success;
+    } catch (e) {
+      return false;
+    }
+  },
+
+  async deleteReview(id: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/admin/reviews/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      return data.success;
+    } catch (e) {
+      return false;
+    }
+  },
+
+  async createBlogArticle(artData: any): Promise<Article | null> {
+    try {
+      const res = await fetch(`${API_BASE}/admin/articles`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(artData),
+      });
+      const data = await res.json();
+      return data.data;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  async deleteBlogArticle(id: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/admin/articles/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      return data.success;
+    } catch (e) {
+      return false;
+    }
+  },
 };

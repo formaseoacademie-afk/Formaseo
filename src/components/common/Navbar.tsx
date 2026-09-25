@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, ArrowRight, Menu, X, User as UserIcon, BookOpen, LogOut } from 'lucide-react';
+import { Search, ArrowRight, Menu, X, User as UserIcon, BookOpen, LogOut, ShieldCheck } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../../context/AuthContext';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -115,7 +115,24 @@ export const Navbar: React.FC<NavbarProps> = ({ activePage, onNavigate, onOpenSe
                     <div className="px-4 py-2 border-b border-slate-100">
                       <p className="text-xs text-slate-400 font-medium">Connecté en tant que</p>
                       <p className="text-sm font-bold text-slate-800 truncate">{user.email}</p>
+                      {user.role === 'admin' && (
+                        <span className="inline-block mt-1 text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full">
+                          Administrateur
+                        </span>
+                      )}
                     </div>
+                    {user.role === 'admin' && (
+                      <button
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          onNavigate('admin');
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-sm font-bold text-purple-700 bg-purple-50/50 hover:bg-purple-100/60 flex items-center gap-2.5"
+                      >
+                        <ShieldCheck className="w-4 h-4 text-purple-600" />
+                        Espace Administration
+                      </button>
+                    )}
                     <button
                       onClick={() => {
                         setIsUserMenuOpen(false);

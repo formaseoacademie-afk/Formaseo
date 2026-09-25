@@ -132,7 +132,6 @@ app.post('/api/auth/login', (req, res) => {
     }
     let user = db.findUserByEmail(email);
     if (!user) {
-      // Create test account automatically for demo ease if not existing
       user = db.createUser(email.split('@')[0], email, password || 'demo');
     }
     const { password: _, ...safeUser } = user;
@@ -145,8 +144,8 @@ app.post('/api/auth/login', (req, res) => {
 app.get('/api/auth/me', (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    const userId = authHeader?.replace('Bearer mock-jwt-', '') || 'usr-1';
-    const user = db.findUserById(userId) || db.findUserById('usr-1');
+    const userId = authHeader?.replace('Bearer mock-jwt-', '');
+    const user = (userId ? db.findUserById(userId) : null) || db.findUserById('usr-1');
     if (!user) {
       return res.status(401).json({ success: false, message: 'Non authentifié' });
     }
@@ -189,6 +188,14 @@ app.post('/api/enrollments/toggle-lesson', (req, res) => {
 });
 
 // Contact & Diagnostic SEO Form
+app.get('/api/contact', (req, res) => {
+  try {
+    res.json({ success: true, data: db.getContacts() });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur récupération contacts' });
+  }
+});
+
 app.post('/api/contact', (req, res) => {
   try {
     const { name, email, phone, subject, message, serviceInterest } = req.body;
@@ -210,6 +217,137 @@ app.post('/api/contact', (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Erreur formulaire de contact' });
+  }
+});
+
+// ==========================================
+// ADMIN ENDPOINTS
+// ==========================================
+
+// 1. Overview metrics
+app.get('/api/admin/overview', (req, res) => {
+  try {
+    const courses = db.getCourses();
+    const contacts = db.getContacts();
+    const users = db.getUsers();
+    const reviews = db.getReviews();
+    const stats = db.getStats();
+
+    const newContacts = contacts.filter(c => c.status === 'new').length;
+    const totalEnrollments = users.reduce((acc, u) => acc + u.enrolledCourseIds.length, 0);
+
+    res.json({
+      success: true,
+      data: {
+        totalCourses: courses.length,
+        totalContacts: contacts.length,
+        newContactsCount: newContacts,
+        totalUsers: users.length,
+        totalEnrollments,
+        totalReviews: reviews.length,
+        satisfactionRate: stats.satisfactionRate,
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur admin overview' });
+  }
+});
+
+// 2. Contacts management
+app.get('/api/admin/contacts', (req, res) => {
+  try {
+    res.json({ success: true, data: db.getContacts() });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur admin contacts' });
+  }
+});
+
+app.patch('/api/admin/contacts/:id', (req, res) => {
+  try {
+    const { status } = req.body;
+    const updated = db.updateContactStatus(req.params.id, status);
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'Message introuvable' });
+    }
+    res.json({ success: true, data: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur mise à jour message' });
+  }
+});
+
+// 3. Courses CRUD
+app.post('/api/admin/courses', (req, res) => {
+  try {
+    const newCourse = db.addCourse(req.body);
+    res.json({ success: true, data: newCourse });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur création cours' });
+  }
+});
+
+app.put('/api/admin/courses/:id', (req, res) => {
+  try {
+    const updated = db.updateCourse(req.params.id, req.body);
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'Cours introuvable' });
+    }
+    res.json({ success: true, data: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur modification cours' });
+  }
+});
+
+app.delete('/api/admin/courses/:id', (req, res) => {
+  try {
+    const deleted = db.deleteCourse(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: 'Cours introuvable' });
+    }
+    res.json({ success: true, message: 'Cours supprimé avec succès' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur suppression cours' });
+  }
+});
+
+// 4. Users list
+app.get('/api/admin/users', (req, res) => {
+  try {
+    const users = db.getUsers().map(u => {
+      const { password, ...safe } = u;
+      return safe;
+    });
+    res.json({ success: true, data: users });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur utilisateurs' });
+  }
+});
+
+// 5. Reviews moderation
+app.delete('/api/admin/reviews/:id', (req, res) => {
+  try {
+    const ok = db.deleteReview(req.params.id);
+    res.json({ success: ok, message: ok ? 'Avis supprimé' : 'Avis non trouvé' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur suppression avis' });
+  }
+});
+
+// 6. Blog Articles CRUD
+app.post('/api/admin/articles', (req, res) => {
+  try {
+    const newArt = db.addArticle(req.body);
+    res.json({ success: true, data: newArt });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur ajout article' });
+  }
+});
+
+app.delete('/api/admin/articles/:id', (req, res) => {
+  try {
+    const ok = db.deleteArticle(req.params.id);
+    res.json({ success: ok, message: ok ? 'Article supprimé' : 'Article non trouvé' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur suppression article' });
   }
 });
 

@@ -213,6 +213,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <span className="hover:text-white cursor-pointer">Politique de Confidentialité</span>
             <span>•</span>
             <span className="hover:text-white cursor-pointer">Mentions Légales</span>
+            <span>•</span>
+            <button
+              onClick={() => onNavigate('admin')}
+              className="text-[#F5B716] font-bold hover:underline"
+            >
+              🔒 Espace Admin
+            </button>
           </div>
         </div>
       </div>
