@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+  
+  body {
+    background-color: #F8FAFD;
+    color: #0F172A;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom Hero Curve Mask & Backgrounds */
+.hero-curve-bg {
+  background: radial-gradient(130% 120% at 90% 10%, #0F3A5C 0%, #082238 60%, #041422 100%);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+@media (min-width: 1024px) {
+  .hero-container {
+    border-radius: 0 0 4rem 4rem;
+  }
+}
+
+/* Glassmorphism & Custom Card styles */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.glass-dark {
+  background: rgba(11, 44, 71, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Glowing Mesh Orbs */
+.glow-orb-yellow {
+  background: radial-gradient(circle, rgba(245, 183, 22, 0.18) 0%, rgba(245, 183, 22, 0) 70%);
+}
+
+.glow-orb-blue {
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(56, 189, 248, 0) 70%);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Smooth Pulse Animations */
+@keyframes soft-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-soft-float {
+  animation: soft-float 5s ease-in-out infinite;
+}
