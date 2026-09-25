@@ -20,33 +20,102 @@ import { AdminPage } from './pages/AdminPage';
 import { AuthProvider } from './context/AuthContext';
 import { CurrencyProvider } from './context/CurrencyContext';
 
+// Helper to determine initial page from window location URL
+const getPageFromPath = (): { page: string; param?: string } => {
+  const path = window.location.pathname.toLowerCase();
+  const hash = window.location.hash.toLowerCase().replace('#', '');
+
+  if (path === '/admin' || hash === 'admin' || path.startsWith('/admin')) return { page: 'admin' };
+  if (path === '/courses' || path === '/formations' || hash === 'courses') return { page: 'courses' };
+  if (path === '/about' || path === '/a-propos' || hash === 'about') return { page: 'about' };
+  if (path === '/pricing' || path === '/tarifs' || hash === 'pricing') return { page: 'pricing' };
+  if (path === '/blog' || hash === 'blog') return { page: 'blog' };
+  if (path === '/contact' || hash === 'contact') return { page: 'contact' };
+  if (path === '/dashboard' || path === '/espace-etudiant' || hash === 'dashboard') return { page: 'dashboard' };
+
+  if (path.startsWith('/course/')) {
+    const slug = path.replace('/course/', '');
+    return { page: 'course-detail', param: slug };
+  }
+  if (path.startsWith('/learn/')) {
+    const slug = path.replace('/learn/', '');
+    return { page: 'course-learn', param: slug };
+  }
+  if (path.startsWith('/blog/')) {
+    const slug = path.replace('/blog/', '');
+    return { page: 'article-detail', param: slug };
+  }
+
+  return { page: 'home' };
+};
+
 export const AppContent: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState('home');
-  const [courseSlug, setCourseSlug] = useState<string>('seo-debutant-fondations');
-  const [articleSlug, setArticleSlug] = useState<string>('guide-seo-maroc-2026');
+  const initial = getPageFromPath();
+  const [currentPage, setCurrentPage] = useState(initial.page);
+  const [courseSlug, setCourseSlug] = useState<string>(initial.param || 'seo-debutant-fondations');
+  const [articleSlug, setArticleSlug] = useState<string>(initial.param || 'guide-seo-maroc-2026');
   const [initialCategory, setInitialCategory] = useState<string>('all');
 
   // Modals state
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
-  // Scroll to top on navigation
+  // Sync with browser history and URL bar
+  useEffect(() => {
+    const onPopState = () => {
+      const current = getPageFromPath();
+      setCurrentPage(current.page);
+      if (current.param) {
+        if (current.page === 'course-detail' || current.page === 'course-learn') {
+          setCourseSlug(current.param);
+        } else if (current.page === 'article-detail') {
+          setArticleSlug(current.param);
+        }
+      }
+    };
+
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
   const handleNavigate = (page: string, param?: string) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (page === 'course-detail' && param) {
+
+    let urlPath = '/';
+    if (page === 'home') urlPath = '/';
+    else if (page === 'admin') urlPath = '/admin';
+    else if (page === 'courses') {
+      urlPath = '/courses';
+      if (param) setInitialCategory(param);
+      else setInitialCategory('all');
+    }
+    else if (page === 'about') urlPath = '/about';
+    else if (page === 'pricing') urlPath = '/pricing';
+    else if (page === 'blog') urlPath = '/blog';
+    else if (page === 'contact') urlPath = '/contact';
+    else if (page === 'dashboard') urlPath = '/dashboard';
+    else if (page === 'course-detail' && param) {
       setCourseSlug(param);
+      urlPath = `/course/${param}`;
     } else if (page === 'article-detail' && param) {
       setArticleSlug(param);
-    } else if (page === 'courses' && param) {
-      setInitialCategory(param);
-    } else if (page === 'courses' && !param) {
-      setInitialCategory('all');
+      urlPath = `/blog/${param}`;
     }
+
+    try {
+      window.history.pushState(null, '', urlPath);
+    } catch (e) {
+      // Ignore if pushState blocked
+    }
+
     setCurrentPage(page);
   };
 
   const handleStartLearning = (slug: string) => {
     setCourseSlug(slug);
+    try {
+      window.history.pushState(null, '', `/learn/${slug}`);
+    } catch (e) {}
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setCurrentPage('course-learn');
   };
