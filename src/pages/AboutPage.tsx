@@ -1,134 +1,241 @@
 import React from 'react';
-import { Target, Award, Users, Globe, ShieldCheck, Sparkles, Heart, ArrowRight } from 'lucide-react';
+import { 
+  Target, 
+  MapPin, 
+  Users, 
+  Globe, 
+  ShieldCheck, 
+  Sparkles, 
+  ArrowRight, 
+  Laptop, 
+  Compass, 
+  Layers, 
+  Info,
+  CheckCircle2,
+  ExternalLink
+} from 'lucide-react';
 import { Logo } from '../components/common/Logo';
+import { useAcademySettings } from '../services/api';
 
 interface AboutPageProps {
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, param?: string) => void;
+  onOpenApplyModal?: (intent?: 'programme' | 'candidature') => void;
 }
 
-export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
-  const trainers = [
-    {
-      name: 'Yassine Bennani',
-      role: 'Fondateur & Head of SEO Strategy',
-      bio: 'Plus de 10 ans d’expertise en acquisition organique. A piloté des stratégies de croissance pour les leaders de l’e-commerce et des médias au Maroc et en Europe.',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-      name: 'Mehdi Alami',
-      role: 'Directeur Technique SEO & Data Engineer',
-      bio: 'Spécialiste du SEO programmatique, de l’analyse de logs et de l’optimisation Core Web Vitals sur des architectures à plusieurs millions d’URLs.',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-      name: 'Salma Tazi',
-      role: 'Lead Content Strategist & Formatrice IA',
-      bio: 'Experte en cocons sémantiques, intention de recherche et intégration de l’IA générative dans les processus éditoriaux à fort impact.',
-      avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80',
-    },
-  ];
+export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, onOpenApplyModal }) => {
+  const { data: settings } = useAcademySettings();
 
   return (
-    <div className="min-h-screen py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+    <div className="space-y-16 pb-20">
       
-      {/* Hero */}
-      <div className="bg-[#0A263B] text-white rounded-3xl p-8 sm:p-14 relative overflow-hidden border border-slate-800">
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2">
-            <span className="w-5 h-1 bg-[#F5B716] rounded-full inline-block" />
-            <span className="text-xs font-black uppercase tracking-wider text-[#F5B716]">
-              Notre Histoire & Mission
-            </span>
+      {/* Hero Header */}
+      <section className="bg-[#082238] text-white py-16 sm:py-20 relative overflow-hidden border-b border-slate-800">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#F5B716]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-6">
+          
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs text-[#F5B716] font-bold">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>À Propos de FormaSEO.ma</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            L'Académie qui forme l'élite du Référencement Naturel au Maroc
-          </h1>
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            FormaSeo est née d'un constat simple : le web marocain regorge d'opportunités inexploitées, mais manque cruellement de formations SEO modernes, pointues et adaptées aux réalités du marché local et international.
-          </p>
-        </div>
-      </div>
 
-      {/* 3 Core Values */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
-          <div className="w-12 h-12 rounded-2xl bg-yellow-100 text-yellow-800 flex items-center justify-center mb-5">
-            <Target className="w-6 h-6" />
+          <div className="max-w-3xl space-y-4">
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+              L'Académie Pratique du Référencement & du Web à Casablanca
+            </h1>
+            <p className="text-lg sm:text-xl text-slate-300 font-normal leading-relaxed">
+              Une initiative pédagogique marocaine née d'une conviction simple : le digital ne s'apprend pas dans des manuels théoriques, mais en concevant et en positionnant de vrais sites internet.
+            </p>
           </div>
-          <h3 className="text-xl font-black text-slate-900 mb-2">Excellence Pratique</h3>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            Nous refusons le superflu théorique. Chaque notion enseignée répond à un objectif direct : générer du trafic qualifié et du chiffre d'affaires.
-          </p>
-        </div>
 
-        <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
-          <div className="w-12 h-12 rounded-2xl bg-blue-100 text-[#0B3A60] flex items-center justify-center mb-5">
-            <Globe className="w-6 h-6" />
-          </div>
-          <h3 className="text-xl font-black text-slate-900 mb-2">Ancrage Local & Mondial</h3>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            Des techniques de pointe valables aussi bien pour ranker sur Google Maroc (Français/Arabe/Darija) que pour attaquer des marchés anglophones concurrentiels.
-          </p>
-        </div>
-
-        <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center mb-5">
-            <Users className="w-6 h-6" />
-          </div>
-          <h3 className="text-xl font-black text-slate-900 mb-2">Communauté & Entraide</h3>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            Un réseau solidaire de plus de 2 800 étudiants, freelances et directeurs marketing qui partagent quotidiennement opportunités et retours d'expériences.
-          </p>
-        </div>
-      </div>
-
-      {/* Trainers Spotlight */}
-      <div>
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 mb-2">
-            <span className="w-5 h-1 bg-[#F5B716] rounded-full inline-block" />
-            <span className="text-xs font-black uppercase tracking-wider text-slate-500">
-              Corps Pédagogique
-            </span>
-            <span className="w-5 h-1 bg-[#F5B716] rounded-full inline-block" />
-          </div>
-          <h2 className="text-3xl font-black text-slate-900">
-            Formez-vous auprès des meilleurs spécialistes
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {trainers.map((t, idx) => (
-            <div key={idx} className="bg-white rounded-3xl p-7 border border-slate-200 shadow-sm hover:shadow-lg transition-all text-center flex flex-col items-center">
-              <img
-                src={t.avatar}
-                alt={t.name}
-                className="w-24 h-24 rounded-full object-cover border-4 border-[#F5B716] shadow-md mb-4"
-              />
-              <h3 className="text-lg font-black text-slate-900">{t.name}</h3>
-              <p className="text-xs font-bold text-[#F5B716] mb-3">{t.role}</p>
-              <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">{t.bio}</p>
+          <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-300 pt-2">
+            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800/80 border border-slate-700">
+              <MapPin className="w-4 h-4 text-[#F5B716]" />
+              <span>Casablanca, Maroc (Avenue Mers Sultan)</span>
             </div>
-          ))}
-        </div>
-      </div>
+            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800/80 border border-slate-700">
+              <Laptop className="w-4 h-4 text-[#F5B716]" />
+              <span>Formations en Présentiel & À Distance</span>
+            </div>
+          </div>
 
-      {/* CTA */}
-      <div className="p-8 sm:p-12 bg-slate-100 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-6 border border-slate-200">
-        <div>
-          <h3 className="text-xl sm:text-2xl font-black text-slate-900">
-            Envie de propulser vos compétences SEO ?
-          </h3>
-          <p className="text-slate-600 text-sm mt-1">Découvrez dès maintenant notre catalogue de formations complètes.</p>
         </div>
-        <button
-          onClick={() => onNavigate('courses')}
-          className="px-6 py-3.5 bg-[#F5B716] hover:bg-[#E0A30B] text-slate-950 font-black rounded-full text-sm shrink-0 flex items-center gap-2"
-        >
-          <span>Découvrir les formations</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
-      </div>
+      </section>
+
+      {/* Mission & Philosophy */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          <div className="lg:col-span-7 space-y-6">
+            <div className="inline-flex items-center gap-2">
+              <span className="w-5 h-1 bg-[#F5B716] rounded-full inline-block" />
+              <span className="text-xs font-black uppercase tracking-wider text-slate-500">
+                Notre Philosophie
+              </span>
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
+              Remplacer les diaporamas passifs par des livrables concrets
+            </h2>
+
+            <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
+              Au Maroc, le marché du travail et les entrepreneurs ont besoin de compétences immédiatement opérationnelles. Beaucoup de formations dispensent des définitions générales du référencement sans jamais faire ouvrir un panneau d'administration ni une console Google.
+            </p>
+
+            <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
+              Chez <strong>FORMASEO.ma</strong>, nous avons structuré un cadre où chaque apprenant travaille directement sur son propre projet digital : de l'installation de WordPress à la recherche de mots-clés, de la rédaction sémantique à l'optimisation technique et l'analyse de trafic.
+            </p>
+
+            <div className="space-y-3 pt-2">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-[#F5B716] shrink-0 mt-0.5" />
+                <span className="text-xs sm:text-sm text-slate-700">
+                  <strong>Apprentissage par le projet :</strong> vous ne repartez pas seulement avec des notes, mais avec un site en ligne.
+                </span>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-[#F5B716] shrink-0 mt-0.5" />
+                <span className="text-xs sm:text-sm text-slate-700">
+                  <strong>Outils de référence :</strong> Google Search Console, Google Analytics 4, Keyword Planner, PageSpeed.
+                </span>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-[#F5B716] shrink-0 mt-0.5" />
+                <span className="text-xs sm:text-sm text-slate-700">
+                  <strong>Accompagnement de proximité :</strong> petits groupes pour permettre un suivi individualisé.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5 bg-[#082238] rounded-3xl p-8 text-white space-y-6 shadow-xl">
+            <h3 className="text-lg font-black text-[#F5B716]">
+              Les 4 Piliers de l'Académie
+            </h3>
+            
+            <div className="space-y-4 text-xs sm:text-sm">
+              <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-700/80 space-y-1">
+                <strong className="text-white block font-bold">1. Concret & Actionnable</strong>
+                <p className="text-slate-300 text-xs">Chaque heure de cours se traduit par une action directement menée sur un site réel.</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-700/80 space-y-1">
+                <strong className="text-white block font-bold">2. Ancrage Marocain</strong>
+                <p className="text-slate-300 text-xs">Cas pratiques et stratégies locales adaptés aux réalités du marché marocain et francophone.</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-700/80 space-y-1">
+                <strong className="text-white block font-bold">3. Autonomie Technique</strong>
+                <p className="text-slate-300 text-xs">Comprendre le fonctionnement des moteurs sans jargon inutile pour savoir auditer et corriger.</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-700/80 space-y-1">
+                <strong className="text-white block font-bold">4. Clarté & Transparence</strong>
+                <p className="text-slate-300 text-xs">Aucune promesse trompeuse de résultats miracles : une méthode rigoureuse basée sur le travail de qualité.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Founder & Instructor Profile */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-3xl border border-slate-200 p-8 sm:p-12 shadow-sm space-y-8">
+          
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+            <div>
+              <span className="text-xs font-black uppercase tracking-wider text-slate-400 block mb-1">
+                Fondation & Direction Pédagogique
+              </span>
+              <h2 className="text-2xl font-black text-slate-900">
+                Wassim Kassy
+              </h2>
+              <p className="text-xs sm:text-sm text-[#F5B716] font-bold">
+                Fondateur & Consultant SEO chez FormaSEO.ma
+              </p>
+            </div>
+
+            <a
+              href="https://www.linkedin.com/in/kassy-wassim"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              <span>Profil LinkedIn</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            <div className="md:col-span-4 flex justify-center">
+              <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-3xl bg-slate-900 border-4 border-[#F5B716] flex items-center justify-center text-white text-3xl font-black shadow-lg">
+                WK
+              </div>
+            </div>
+
+            <div className="md:col-span-8 space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p>
+                Consultant en référencement naturel et formateur digital, Wassim Kassy a fondé FormaSEO.ma pour répondre au besoin d'un enseignement pratique du SEO et de la visibilité sur Google à destination des professionnels et porteurs de projet au Maroc.
+              </p>
+              <p>
+                Son approche pédagogique privilégie la mise en situation réelle : accompagner chaque participant dans la structuration d'un site WordPress, la compréhension fine des critères de classement Google, et l'acquisition durable de trafic sans artifice.
+              </p>
+
+              <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/70 text-xs text-amber-950 flex items-start gap-2.5">
+                <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                <span>
+                  <strong>Note de transparence :</strong> Les détails biographiques et photographies officielles sont en cours de confirmation finale avec la direction avant publication intégrale.
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Location & Contact Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            
+            <div className="lg:col-span-7 space-y-4">
+              <span className="text-xs font-black uppercase tracking-wider text-[#F5B716]">
+                Implantation
+              </span>
+              <h3 className="text-2xl font-black">
+                Au cœur de Casablanca
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Les sessions en présentiel se déroulent à Casablanca, dans le quartier central d'Avenue Mers Sultan. Les apprenants à distance ou situés dans d'autres villes du Maroc peuvent suivre l'intégralité du cursus en direct avec le même niveau d'encadrement.
+              </p>
+              <div className="text-xs text-slate-400 font-medium">
+                📍 Repère indicatif : Quartier Avenue Mers Sultan, Casablanca, Maroc (adresse exacte communiquée à la convocation).
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  if (onOpenApplyModal) onOpenApplyModal('candidature');
+                  else onNavigate('contact');
+                }}
+                className="w-full py-4 rounded-full bg-[#F5B716] hover:bg-[#E0A30B] text-slate-950 font-black text-sm transition-all text-center flex items-center justify-center gap-2"
+              >
+                <span>Rejoindre la prochaine session</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => onNavigate('contact')}
+                className="w-full py-3.5 rounded-full border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-white font-bold text-xs text-center"
+              >
+                Poser une question à l'académie
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </section>
 
     </div>
   );

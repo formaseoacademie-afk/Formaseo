@@ -1,15 +1,79 @@
+export interface CurriculumWeek {
+  weekNumber: number;
+  title: string;
+  focus?: string;
+  hours?: string;
+  objective?: string;
+  topics: string[];
+  tools?: string[];
+  deliverable?: string;
+  practicalWorkshop?: string;
+  confirmationStatus?: 'proposé' | 'validé';
+}
+
+export interface AcademySettings {
+  name?: string;
+  academyName?: string;
+  domain?: string;
+  city?: string;
+  address?: string;
+  addressNote?: string;
+  founderName?: string;
+  founderRole?: string;
+  founderStatus?: string;
+  headline?: string;
+  subtitle?: string;
+  formatDescription?: string;
+  proposedDuration?: string;
+  duration?: string;
+  nextSessionDate?: string;
+  proposedPriceNote?: string;
+  priceNote?: string;
+  email?: string;
+  phone?: string;
+  includedItemsNote?: string[];
+  audiences?: { title: string; subtitle: string; description: string; icon: string }[];
+  toolsCovered?: { name: string; category: string; description: string }[];
+  ownerChecklist?: { id: string; label?: string; title?: string; category?: string; status: 'en_attente' | 'confirmé' | 'approved' | 'pending'; notes?: string; currentValue?: string; description?: string }[];
+}
+
+export interface Enquiry {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  profileType: 'entrepreneur' | 'freelance' | 'etudiant' | 'professionnel' | 'student' | 'business_owner' | 'autre';
+  goal: string;
+  preferredFormat: 'presentiel_casablanca' | 'en_ligne' | 'flexible' | 'presential' | 'online' | 'hybrid';
+  consent?: boolean;
+  createdAt: string;
+  status: 'new' | 'in_review' | 'contacted' | 'enrolled' | 'archived';
+  notes?: string;
+}
+
+export interface FaqItem {
+  id: string | number;
+  question: string;
+  answer: string;
+  category: string;
+  needsConfirmation?: boolean;
+}
+
+// Backward compatibility types
 export interface Lesson {
   id: string;
   title: string;
-  duration: string;
-  videoUrl: string;
-  summary: string;
-  resources?: { name: string; url: string; size: string }[];
+  durationMinutes?: number;
+  duration?: string;
+  summary?: string;
+  videoUrl?: string;
+  type?: 'video' | 'quiz' | 'workshop';
 }
 
 export interface Module {
   id: string;
   title: string;
+  durationHours?: number;
   lessons: Lesson[];
 }
 
@@ -21,24 +85,27 @@ export interface Course {
   fullDescription: string;
   category: string;
   categoryName: string;
-  level: 'Débutant' | 'Intermédiaire' | 'Avancé' | 'Tous niveaux';
+  level: string;
   durationHours: number;
-  totalLessons: number;
   priceMAD: number;
+  originalPriceMAD?: number;
   priceEUR: number;
-  originalPriceMAD: number;
   rating: number;
-  reviewsCount: number;
-  studentsCount: number;
-  instructor: {
+  reviewCount: number;
+  reviewsCount?: number;
+  studentCount: number;
+  studentsCount?: number;
+  totalLessons?: number;
+  badge?: string;
+  instructorName?: string;
+  instructorRole?: string;
+  instructor?: {
     name: string;
     role: string;
     avatar: string;
-    bio: string;
+    bio?: string;
   };
   thumbnail: string;
-  badge?: string;
-  featured: boolean;
   learningOutcomes: string[];
   prerequisites: string[];
   modules: Module[];
@@ -48,11 +115,23 @@ export interface Category {
   id: string;
   slug: string;
   name: string;
-  tagline: string;
   description: string;
-  icon: string;
-  themeColor: 'blue' | 'yellow' | 'cyan' | 'emerald' | 'purple' | 'orange';
-  coursesCount: number;
+  iconName?: string;
+  icon?: string;
+  courseCount: number;
+}
+
+export interface Review {
+  id: string;
+  studentName?: string;
+  studentRole?: string;
+  userName?: string;
+  rating: number;
+  comment: string;
+  date: string;
+  courseTitle?: string;
+  avatarUrl?: string;
+  userAvatar?: string;
 }
 
 export interface Article {
@@ -62,37 +141,24 @@ export interface Article {
   excerpt: string;
   content: string;
   category: string;
-  author: {
-    name: string;
-    avatar: string;
-    role: string;
-  };
-  publishedAt: string;
-  readTimeMinutes: number;
-  thumbnail: string;
+  author: string;
+  date?: string;
+  publishedAt?: string;
+  readTimeMinutes?: number;
+  readTime?: string;
+  imageUrl?: string;
+  coverImage?: string;
   tags: string[];
 }
 
 export interface User {
   id: string;
-  name: string;
   email: string;
-  role: 'student' | 'admin';
-  avatar: string;
+  name: string;
+  role: 'student' | 'instructor' | 'admin';
+  avatar?: string;
   enrolledCourseIds: string[];
   completedLessonIds: string[];
-  createdAt: string;
-}
-
-export interface Review {
-  id: string;
-  courseId: string;
-  userName: string;
-  userRole: string;
-  userAvatar: string;
-  rating: number;
-  comment: string;
-  date: string;
 }
 
 export interface Stats {

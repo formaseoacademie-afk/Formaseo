@@ -1,173 +1,139 @@
-import React, { useState } from 'react';
-import { ArrowRight, CheckCircle2, Mail, MapPin, Phone, ShieldCheck, Sparkles, Heart } from 'lucide-react';
+import React from 'react';
+import { MapPin, Mail, ShieldCheck, Sparkles, BookOpen, ArrowRight } from 'lucide-react';
 import { Logo } from './Logo';
 
 interface FooterProps {
   onNavigate: (page: string) => void;
+  onOpenApplyModal?: (intent?: 'programme' | 'candidature') => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setSubscribed(true);
-      setTimeout(() => setSubscribed(false), 5000);
-      setEmail('');
-    }
-  };
-
+export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenApplyModal }) => {
   return (
     <footer className="bg-[#061826] text-white border-t border-slate-800 pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Top Newsletter & Academy summary */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-14 border-b border-slate-800">
-          <div className="lg:col-span-5 space-y-4">
-            <Logo variant="light" size="lg" />
-            <p className="text-slate-300 text-sm leading-relaxed max-w-md pt-2">
-              L'Académie marocaine de référence dédiée au référencement naturel et à la visibilité digitale sur Google. Formations pratiques, méthodologies éprouvées et accompagnement d'experts.
+        
+        {/* Top summary row */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 pb-12 border-b border-slate-800">
+          <div className="lg:col-span-6 space-y-4">
+            <div onClick={() => onNavigate('home')} className="cursor-pointer inline-block">
+              <Logo />
+            </div>
+            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-md pt-2">
+              FormaSEO.ma propose une formation pratique à Casablanca axée sur la création de sites WordPress, le référencement naturel (SEO), la visibilité locale et la mesure des résultats.
             </p>
-            <div className="flex items-center gap-6 pt-2 text-xs text-slate-400">
+            <div className="flex flex-col sm:flex-row gap-3 pt-2 text-xs text-slate-400">
               <span className="flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-[#F5B716]" /> Marina Casablanca & Rabat
+                <MapPin className="w-4 h-4 text-[#F5B716] shrink-0" />
+                Secteur Avenue Mers Sultan, Casablanca
               </span>
               <span className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-[#F5B716]" /> Certifications reconnues
+                <ShieldCheck className="w-4 h-4 text-[#F5B716] shrink-0" />
+                Apprentissage sur projet réel
               </span>
             </div>
           </div>
 
-          <div className="lg:col-span-7 bg-slate-900/80 p-6 sm:p-8 rounded-3xl border border-slate-800 flex flex-col justify-between">
+          <div className="lg:col-span-6 bg-slate-900/80 p-6 sm:p-8 rounded-3xl border border-slate-800 flex flex-col justify-between">
             <div>
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#F5B716] mb-2">
-                <Sparkles className="w-3.5 h-3.5" /> La Newsletter SEO N°1 au Maroc
+              <span className="text-[11px] font-bold text-[#F5B716] uppercase tracking-wider">
+                Prochaine Promotion
               </span>
-              <h4 className="text-lg sm:text-xl font-bold text-white mb-2">
-                Recevez chaque semaine nos analyses algorithmiques & astuces SEO gratuites
+              <h4 className="text-base sm:text-lg font-black text-white mt-1">
+                Prêt à créer et référencer votre propre site web ?
               </h4>
-              <p className="text-xs text-slate-400 mb-4">
-                Rejoignez 5 400+ professionnels du web. Aucun spam, désinscription en un clic.
+              <p className="text-slate-300 text-xs mt-2 leading-relaxed">
+                Les inscriptions pour la prochaine session sont ouvertes. Déposez votre candidature pour être contacté par notre équipe.
               </p>
             </div>
 
-            {subscribed ? (
-              <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex items-center gap-2 text-emerald-400 text-sm font-semibold">
-                <CheckCircle2 className="w-5 h-5" />
-                <span>Merci ! Vous êtes bien inscrit à la lettre d'information FormaSeo.</span>
-              </div>
-            ) : (
-              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2.5">
-                <div className="relative flex-1">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="email"
-                    required
-                    placeholder="Votre adresse email professionnelle..."
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 bg-slate-950 border border-slate-700 rounded-full text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#F5B716]"
-                  />
-                </div>
+            <div className="pt-6 flex flex-wrap gap-3">
+              {onOpenApplyModal && (
                 <button
-                  type="submit"
-                  className="px-6 py-3 rounded-full bg-[#F5B716] hover:bg-[#E0A30B] text-slate-950 font-bold text-sm transition-all flex items-center justify-center gap-2"
+                  onClick={() => onOpenApplyModal('candidature')}
+                  className="px-5 py-2.5 rounded-full bg-[#F5B716] hover:bg-[#E0A30B] text-slate-950 font-black text-xs transition-all flex items-center gap-2 cursor-pointer shadow-sm"
                 >
-                  <span>S'abonner</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span>Candidater à la formation</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
-              </form>
-            )}
+              )}
+
+              <button
+                onClick={() => onNavigate('programme')}
+                className="px-5 py-2.5 rounded-full border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors cursor-pointer"
+              >
+                <span>Découvrir le programme 5 semaines</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Links Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-12 border-b border-slate-800 text-sm">
-          <div>
-            <h5 className="font-bold text-white mb-4 uppercase text-xs tracking-wider text-[#F5B716]">
-              Formations
+        {/* Links grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-10 border-b border-slate-800 text-xs">
+          
+          <div className="space-y-3">
+            <h5 className="font-extrabold uppercase tracking-wider text-[#F5B716] text-[11px]">
+              Formation
             </h5>
-            <ul className="space-y-2.5 text-slate-300">
+            <ul className="space-y-2 text-slate-300">
               <li>
-                <button onClick={() => onNavigate('courses')} className="hover:text-white transition-colors">
-                  SEO Débutant (Fondations)
+                <button onClick={() => onNavigate('formation')} className="hover:text-white transition-colors">
+                  Présentation de la Formation
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('courses')} className="hover:text-white transition-colors">
-                  SEO Avancé & Sémantique
+                <button onClick={() => onNavigate('programme')} className="hover:text-white transition-colors">
+                  Programme Semaine par Semaine
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('courses')} className="hover:text-white transition-colors">
-                  Rédaction SEO & IA Hybride
+                <button onClick={() => onNavigate('formation')} className="hover:text-white transition-colors">
+                  Inclusions (WordPress, Hébergement)
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('courses')} className="hover:text-white transition-colors">
-                  SEO E-commerce & Business
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('courses')} className="hover:text-white transition-colors">
-                  Netlinking & Autorité
+                <button onClick={() => onNavigate('formation')} className="hover:text-white transition-colors">
+                  Prérequis & Profils Cibles
                 </button>
               </li>
             </ul>
           </div>
 
-          <div>
-            <h5 className="font-bold text-white mb-4 uppercase text-xs tracking-wider text-[#F5B716]">
-              Académie
+          <div className="space-y-3">
+            <h5 className="font-extrabold uppercase tracking-wider text-[#F5B716] text-[11px]">
+              L'Académie
             </h5>
-            <ul className="space-y-2.5 text-slate-300">
+            <ul className="space-y-2 text-slate-300">
               <li>
                 <button onClick={() => onNavigate('about')} className="hover:text-white transition-colors">
-                  À propos de FormaSeo
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('pricing')} className="hover:text-white transition-colors">
-                  Tarifs & Formules
+                  À Propos de FormaSEO.ma
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('about')} className="hover:text-white transition-colors">
-                  Nos Formateurs Experts
+                  Méthodologie Pédagogique
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('about')} className="hover:text-white transition-colors">
-                  Certifications officielles
+                  Formateur (Wassim Kassy)
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('contact')} className="hover:text-white transition-colors">
-                  Formations en Entreprise (B2B)
+                <button onClick={() => onNavigate('about')} className="hover:text-white transition-colors">
+                  Emplacement Casablanca
                 </button>
               </li>
             </ul>
           </div>
 
-          <div>
-            <h5 className="font-bold text-white mb-4 uppercase text-xs tracking-wider text-[#F5B716]">
-              Ressources
+          <div className="space-y-3">
+            <h5 className="font-extrabold uppercase tracking-wider text-[#F5B716] text-[11px]">
+              Admissions & Aide
             </h5>
-            <ul className="space-y-2.5 text-slate-300">
-              <li>
-                <button onClick={() => onNavigate('blog')} className="hover:text-white transition-colors">
-                  Blog & Actualités Google
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('blog')} className="hover:text-white transition-colors">
-                  Guide SEO Maroc 2026
-                </button>
-              </li>
+            <ul className="space-y-2 text-slate-300">
               <li>
                 <button onClick={() => onNavigate('contact')} className="hover:text-white transition-colors">
-                  Demande d'Audit Diagnostic
+                  Déposer une Candidature
                 </button>
               </li>
               <li>
@@ -175,46 +141,38 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   Foire Aux Questions (FAQ)
                 </button>
               </li>
-            </ul>
-          </div>
-
-          <div>
-            <h5 className="font-bold text-white mb-4 uppercase text-xs tracking-wider text-[#F5B716]">
-              Contact & Support
-            </h5>
-            <ul className="space-y-2.5 text-slate-300 text-xs">
-              <li className="flex items-center gap-2">
-                <Phone className="w-3.5 h-3.5 text-[#F5B716]" /> +212 (0)5 22 40 80 90
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail className="w-3.5 h-3.5 text-[#F5B716]" /> contact@formaseo.ma
-              </li>
-              <li className="text-slate-400 mt-2">
-                Du Lundi au Vendredi : 9h00 - 18h30 (GMT+1)
-              </li>
-              <li className="pt-2">
-                <button
-                  onClick={() => onNavigate('contact')}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-all text-xs"
-                >
-                  Prendre rendez-vous
+              <li>
+                <button onClick={() => onNavigate('contact')} className="hover:text-white transition-colors">
+                  Contacter l'Équipe
                 </button>
               </li>
             </ul>
           </div>
+
+          <div className="space-y-3">
+            <h5 className="font-extrabold uppercase tracking-wider text-[#F5B716] text-[11px]">
+              Transparence & Mentions
+            </h5>
+            <p className="text-slate-400 text-[11px] leading-relaxed">
+              FormaSEO.ma • Académie de formation pratique au SEO et marketing digital basée à Casablanca, Maroc.
+            </p>
+            <div className="text-[10px] text-slate-500">
+              * Ce site concerne formaseo.ma (Maroc) et n'a aucun lien avec formaseo.fr.
+            </div>
+          </div>
+
         </div>
 
         {/* Bottom copyright */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
-          <p>© {new Date().getFullYear()} FormaSeo Maroc. Tous droits réservés. Conçu avec passion pour le web marocain.</p>
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
+          <div>
+            © {new Date().getFullYear()} FormaSEO.ma. Tous droits réservés. Casablanca, Maroc.
+          </div>
           <div className="flex items-center gap-4">
-            <span className="hover:text-white cursor-pointer">Conditions Générales</span>
-            <span>•</span>
-            <span className="hover:text-white cursor-pointer">Politique de Confidentialité</span>
-            <span>•</span>
-            <span className="hover:text-white cursor-pointer">Mentions Légales</span>
+            <span className="text-slate-500">Formation 100% pratique sur projet réel</span>
           </div>
         </div>
+
       </div>
     </footer>
   );

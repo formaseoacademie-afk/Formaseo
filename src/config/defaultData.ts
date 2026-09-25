@@ -1,58 +1,6 @@
-import fs from 'fs';
-import path from 'path';
+import { AcademySettings, CurriculumWeek, FaqItem } from '../types';
 
-export interface CurriculumWeek {
-  weekNumber: number;
-  title: string;
-  focus: string;
-  topics: string[];
-  tools: string[];
-  deliverable: string;
-  confirmationStatus: 'proposé' | 'validé';
-}
-
-export interface AcademySettings {
-  name: string;
-  domain: string;
-  city: string;
-  addressNote: string;
-  founderName: string;
-  founderRole: string;
-  founderStatus: string;
-  headline: string;
-  subtitle: string;
-  formatDescription: string;
-  proposedDuration: string;
-  proposedPriceNote: string;
-  includedItemsNote: string[];
-  audiences: { title: string; subtitle: string; description: string; icon: string }[];
-  toolsCovered: { name: string; category: string; description: string }[];
-  ownerChecklist: { id: string; label: string; status: 'en_attente' | 'confirmé'; notes: string }[];
-}
-
-export interface Enquiry {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  profileType: 'entrepreneur' | 'freelance' | 'etudiant' | 'professionnel' | 'autre';
-  goal: string;
-  preferredFormat: 'presentiel_casablanca' | 'en_ligne' | 'flexible';
-  consent: boolean;
-  createdAt: string;
-  status: 'new' | 'in_review' | 'contacted';
-  notes?: string;
-}
-
-export interface FaqItem {
-  id: string;
-  question: string;
-  answer: string;
-  category: string;
-  needsConfirmation?: boolean;
-}
-
-const defaultAcademySettings: AcademySettings = {
+export const fallbackSettings: AcademySettings = {
   name: 'FormaSEO.ma',
   domain: 'formaseo.ma',
   city: 'Casablanca, Maroc',
@@ -116,7 +64,7 @@ const defaultAcademySettings: AcademySettings = {
   ]
 };
 
-const defaultCurriculum: CurriculumWeek[] = [
+export const fallbackCurriculum: CurriculumWeek[] = [
   {
     weekNumber: 1,
     title: 'Fondations Web & Création de votre Site WordPress',
@@ -194,162 +142,37 @@ const defaultCurriculum: CurriculumWeek[] = [
   }
 ];
 
-const defaultFaqs: FaqItem[] = [
+export const fallbackFaqs: FaqItem[] = [
   {
     id: 'faq-1',
-    question: 'En quoi cette formation est-elle différente d’un cours classique ?',
-    answer: 'La formation FormaSEO.ma repose sur la pratique concrète. Plutôt que d’écouter de la théorie passive, vous travaillez directement sur la conception, l’optimisation et le référencement de votre propre site web ou projet professionnel.',
+    question: 'En quoi cette formation est-elle différente d’un cours théorique ?',
+    answer: 'La formation FormaSEO.ma repose sur la pratique concrète. Vous ne vous contentez pas d’écouter des cours magistraux : vous concevez, paramétrez et référencez votre propre site web tout au long du programme.',
     category: 'Pédagogie'
   },
   {
     id: 'faq-2',
-    question: 'Faut-il savoir coder pour suivre la formation ?',
-    answer: 'Non, aucun prérequis en programmation informatique n’est nécessaire. Nous utilisons WordPress et des outils visuels accessibles pour vous apprendre à bâtir un site professionnel et optimisé de façon autonome.',
+    question: 'Faut-il avoir des connaissances préalables en code ou en informatique ?',
+    answer: 'Non. Aucun prérequis en programmation informatique n’est nécessaire. Nous utilisons WordPress et des interfaces visuelles claires pour que vous soyez totalement autonome sur la gestion de votre site.',
     category: 'Prérequis'
   },
   {
     id: 'faq-3',
-    question: 'La formation a-t-elle lieu en présentiel à Casablanca ou en ligne ?',
-    answer: 'FormaSEO.ma propose des formats adaptés (présentiel à Casablanca dans le secteur Mers Sultan, ou sessions à distance avec accompagnement). Les modalités exactes de la prochaine session sont confirmées lors de votre demande de programme.',
+    question: 'La formation se déroule-t-elle à Casablanca ou en ligne ?',
+    answer: 'FormaSEO.ma propose des formats adaptés (en présentiel à Casablanca dans le secteur Mers Sultan, ou en session à distance interactive avec accompagnement). Les détails exacts de la prochaine session sont confirmés lors de votre candidature.',
     category: 'Format',
     needsConfirmation: true
   },
   {
     id: 'faq-4',
-    question: 'Que vais-je concrètement obtenir à la fin de la formation ?',
-    answer: 'Vous repartez avec un site WordPress fonctionnel, votre recherche de mots-clés effectuée, vos pages optimisées pour le SEO, votre fiche Google Maps configurée et vos outils de mesure (Search Console, Analytics) connectés.',
+    question: 'Quel est le résultat concret à la fin des 5 semaines ?',
+    answer: 'Vous disposez d’un site web WordPress en ligne, structuré selon les bonnes pratiques SEO, avec une recherche de mots-clés validée, une fiche Google Maps optimisée et vos outils de mesure (Google Search Console & Analytics) connectés.',
     category: 'Résultats'
   },
   {
     id: 'faq-5',
-    question: 'Quels sont les tarifs et dates de la prochaine session ?',
-    answer: 'Les dates précises, horaires et tarifs de la session à venir vous sont envoyés par email et WhatsApp dès réception de votre formulaire de candidature, afin de vous garantir des informations à jour.',
+    question: 'Comment connaître les dates et tarifs de la prochaine session ?',
+    answer: 'Les dates et tarifs exacts de la prochaine promotion sont communiqués directement par email ou WhatsApp aux personnes ayant rempli le formulaire de demande de programme.',
     category: 'Inscriptions',
     needsConfirmation: true
   }
 ];
-
-const DATA_FILE = path.join(process.cwd(), 'server', 'data_store_formaseo.json');
-
-interface FormaSeoDataStore {
-  settings: AcademySettings;
-  curriculum: CurriculumWeek[];
-  faqs: FaqItem[];
-  enquiries: Enquiry[];
-}
-
-class Database {
-  private data: FormaSeoDataStore;
-
-  constructor() {
-    this.data = this.loadData();
-  }
-
-  private loadData(): FormaSeoDataStore {
-    try {
-      if (fs.existsSync(DATA_FILE)) {
-        const fileContent = fs.readFileSync(DATA_FILE, 'utf-8');
-        return JSON.parse(fileContent);
-      }
-    } catch (err) {
-      console.warn('Could not read persistent data file, using defaults.', err);
-    }
-    const defaultData: FormaSeoDataStore = {
-      settings: defaultAcademySettings,
-      curriculum: defaultCurriculum,
-      faqs: defaultFaqs,
-      enquiries: [
-        {
-          id: 'enq-1',
-          name: 'Youssef El Amrani',
-          email: 'youssef@example.com',
-          phone: '+212 6 00 00 00 00',
-          profileType: 'entrepreneur',
-          goal: 'Lancer un site e-commerce et être visible sur Casablanca',
-          preferredFormat: 'presentiel_casablanca',
-          consent: true,
-          createdAt: new Date().toISOString(),
-          status: 'new',
-        }
-      ]
-    };
-    this.saveData(defaultData);
-    return defaultData;
-  }
-
-  private saveData(dataToSave?: FormaSeoDataStore) {
-    try {
-      const data = dataToSave || this.data;
-      const dir = path.dirname(DATA_FILE);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-      fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
-    } catch (err) {
-      console.error('Error saving data to file:', err);
-    }
-  }
-
-  getSettings(): AcademySettings {
-    return this.data.settings;
-  }
-
-  updateSettings(updates: Partial<AcademySettings>): AcademySettings {
-    this.data.settings = { ...this.data.settings, ...updates };
-    this.saveData();
-    return this.data.settings;
-  }
-
-  getCurriculum(): CurriculumWeek[] {
-    return this.data.curriculum;
-  }
-
-  updateCurriculumWeek(weekNumber: number, updates: Partial<CurriculumWeek>): CurriculumWeek | null {
-    const idx = this.data.curriculum.findIndex(w => w.weekNumber === weekNumber);
-    if (idx === -1) return null;
-    this.data.curriculum[idx] = { ...this.data.curriculum[idx], ...updates };
-    this.saveData();
-    return this.data.curriculum[idx];
-  }
-
-  getFaqs(): FaqItem[] {
-    return this.data.faqs;
-  }
-
-  getEnquiries(): Enquiry[] {
-    return this.data.enquiries;
-  }
-
-  addEnquiry(enquiry: Omit<Enquiry, 'id' | 'createdAt' | 'status'>): Enquiry {
-    const newEnquiry: Enquiry = {
-      ...enquiry,
-      id: 'enq-' + Date.now(),
-      createdAt: new Date().toISOString(),
-      status: 'new'
-    };
-    this.data.enquiries.unshift(newEnquiry);
-    this.saveData();
-    return newEnquiry;
-  }
-
-  updateEnquiryStatus(id: string, status: 'new' | 'in_review' | 'contacted', notes?: string): Enquiry | null {
-    const item = this.data.enquiries.find(e => e.id === id);
-    if (!item) return null;
-    item.status = status;
-    if (notes !== undefined) item.notes = notes;
-    this.saveData();
-    return item;
-  }
-
-  updateChecklistItem(id: string, status: 'en_attente' | 'confirmé', notes?: string) {
-    const item = this.data.settings.ownerChecklist.find(c => c.id === id);
-    if (item) {
-      item.status = status;
-      if (notes) item.notes = notes;
-      this.saveData();
-    }
-    return this.data.settings.ownerChecklist;
-  }
-}
-
-export const db = new Database();

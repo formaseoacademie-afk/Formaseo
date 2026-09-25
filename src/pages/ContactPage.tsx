@@ -1,237 +1,352 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, MessageSquare, Send, CheckCircle2, Clock, Sparkles, MessageCircle } from 'lucide-react';
-import { api } from '../services/api';
+import { Mail, Phone, MapPin, MessageSquare, Send, CheckCircle2, Clock, Sparkles, MessageCircle, ShieldCheck } from 'lucide-react';
+import { api, useAcademySettings } from '../services/api';
 
 export const ContactPage: React.FC = () => {
+  const { data: settings } = useAcademySettings();
   const [formData, setFormData] = useState({
-    name: '',
+    fullName: '',
     email: '',
     phone: '',
-    subject: 'Demande de formation individuelle',
-    message: '',
-    serviceInterest: 'SEO Débutant',
+    audience: 'entrepreneur',
+    preferredFormat: 'presential',
+    goal: '',
+    projectDescription: '',
+    consent: false,
+    honeypot: '',
   });
+
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (formData.honeypot) {
+      return; // Anti-spam bot trap
+    }
+
+    if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim()) {
+      setErrorMsg('Veuillez renseigner votre nom, email et numéro de téléphone / WhatsApp.');
+      return;
+    }
+
+    if (!formData.consent) {
+      setErrorMsg('Veuillez accepter d’être recontacté pour le suivi de votre candidature.');
+      return;
+    }
+
     setLoading(true);
     setSuccessMsg('');
     setErrorMsg('');
 
     try {
-      const res = await api.sendContact(formData);
+      const res = await api.submitEnquiry({
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        audience: formData.audience,
+        preferredFormat: formData.preferredFormat as any,
+        goal: formData.goal || 'Candidature session',
+        projectDescription: formData.projectDescription,
+        type: 'candidature',
+        consentGiven: formData.consent,
+      });
+
       if (res.success) {
-        setSuccessMsg(res.message);
+        setSuccessMsg('Votre demande a bien été enregistrée ! Un conseiller de FormaSEO.ma prendra contact avec vous rapidement.');
         setFormData({
-          name: '',
+          fullName: '',
           email: '',
           phone: '',
-          subject: 'Demande de formation individuelle',
-          message: '',
-          serviceInterest: 'SEO Débutant',
+          audience: 'entrepreneur',
+          preferredFormat: 'presential',
+          goal: '',
+          projectDescription: '',
+          consent: false,
+          honeypot: '',
         });
       } else {
         setErrorMsg(res.message || 'Une erreur est survenue.');
       }
     } catch (err) {
-      setErrorMsg('Erreur de connexion au serveur.');
+      setErrorMsg('Erreur de communication avec le serveur. Veuillez réessayer.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <div className="space-y-16 pb-20">
       
-      {/* Header */}
-      <div className="bg-[#0A263B] text-white rounded-3xl p-8 sm:p-12 relative overflow-hidden border border-slate-800">
-        <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <span className="w-5 h-1 bg-[#F5B716] rounded-full inline-block" />
-            <span className="text-xs font-black uppercase tracking-wider text-[#F5B716]">
-              Contact & Accompagnement
-            </span>
+      {/* Header Banner */}
+      <section className="bg-[#082238] text-white py-16 sm:py-20 relative overflow-hidden border-b border-slate-800">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#F5B716]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs text-[#F5B716] font-bold mb-6">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Candidature & Contact</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-3">
-            Parlons de vos Objectifs SEO
-          </h1>
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            Besoin d'un conseil sur le cursus le plus adapté à votre projet, d'un devis pour votre entreprise ou d'un audit préliminaire ? Notre équipe vous répond avec plaisir.
-          </p>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        
-        {/* Left Column: Contact Form (7 cols) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-sm space-y-6">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900">Envoyez-nous un message</h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Remplissez ce formulaire et un conseiller pédagogique vous contactera sous 24h.
+          <div className="max-w-3xl space-y-4">
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+              Rejoindre l'Académie FormaSEO.ma
+            </h1>
+            <p className="text-lg sm:text-xl text-slate-300 font-normal leading-relaxed">
+              Déposez votre candidature pour la prochaine promotion ou posez toutes vos questions à notre équipe pédagogique à Casablanca.
             </p>
           </div>
 
-          {successMsg && (
-            <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex items-center gap-3 text-xs sm:text-sm font-semibold animate-in fade-in">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-              <span>{successMsg}</span>
-            </div>
-          )}
+        </div>
+      </section>
 
-          {errorMsg && (
-            <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl text-xs sm:text-sm font-semibold">
-              {errorMsg}
+      {/* Main Content Form & Contact Info */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          
+          {/* Form Column */}
+          <div className="lg:col-span-8 bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-sm space-y-6">
+            <div>
+              <h2 className="text-2xl font-black text-slate-900">
+                Formulaire de Candidature & Renseignement
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                Aucun paiement préalable n'est requis. Nous examinons votre profil et vos objectifs pour confirmer l'adéquation de la formation.
+              </p>
             </div>
-          )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Votre Nom & Prénom *</label>
+            {successMsg && (
+              <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl flex items-center gap-3 text-xs sm:text-sm font-semibold animate-in fade-in">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                <span>{successMsg}</span>
+              </div>
+            )}
+
+            {errorMsg && (
+              <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl text-xs sm:text-sm font-semibold">
+                {errorMsg}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Honeypot anti-spam */}
+              <div style={{ display: 'none' }}>
                 <input
                   type="text"
-                  required
-                  placeholder="Ex: Mehdi Alaoui"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#F5B716]"
+                  name="website_trap"
+                  value={formData.honeypot}
+                  onChange={(e) => setFormData({ ...formData, honeypot: e.target.value })}
+                  tabIndex={-1}
+                  autoComplete="off"
                 />
               </div>
+
+              {/* Name & Phone */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Nom & Prénom <span className="text-amber-600">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex: Youssef Mansouri"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    className="w-full p-3.5 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#F5B716] transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Numéro de Téléphone / WhatsApp <span className="text-amber-600">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="Ex: +212 6 XX XX XX XX"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full p-3.5 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#F5B716] transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Email & Audience Profile */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Adresse Email <span className="text-amber-600">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="votre.email@exemple.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full p-3.5 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#F5B716] transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Votre profil actuel
+                  </label>
+                  <select
+                    value={formData.audience}
+                    onChange={(e) => setFormData({ ...formData, audience: e.target.value })}
+                    className="w-full p-3.5 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#F5B716] transition-all cursor-pointer"
+                  >
+                    <option value="entrepreneur">Porteur de projet / Entrepreneur</option>
+                    <option value="freelance">Freelance / Prestataire digital</option>
+                    <option value="student">Étudiant / En reconversion</option>
+                    <option value="business_owner">Dirigeant de PME / Responsable Marketing</option>
+                    <option value="autre">Autre situation</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Preferred Format */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Votre Email *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Format d'apprentissage souhaité
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {[
+                    { id: 'presential', label: 'Présentiel Casablanca (Mers Sultan)' },
+                    { id: 'online', label: 'En ligne en direct' },
+                    { id: 'hybrid', label: 'Formule Hybride' },
+                  ].map((fmt) => (
+                    <label
+                      key={fmt.id}
+                      className={`p-3 rounded-xl border text-xs font-semibold cursor-pointer flex items-center gap-2 transition-all ${
+                        formData.preferredFormat === fmt.id
+                          ? 'border-[#082238] bg-slate-900 text-white'
+                          : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="format"
+                        value={fmt.id}
+                        checked={formData.preferredFormat === fmt.id}
+                        onChange={(e) => setFormData({ ...formData, preferredFormat: e.target.value })}
+                        className="hidden"
+                      />
+                      <span>{fmt.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Goal & Project Description */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Votre objectif ou projet (site existant, idée de projet, secteur d'activité)
+                </label>
+                <textarea
+                  rows={4}
+                  placeholder="Décrivez brièvement ce que vous souhaitez accomplir ou l'URL de votre site actuel si vous en avez un..."
+                  value={formData.projectDescription}
+                  onChange={(e) => setFormData({ ...formData, projectDescription: e.target.value })}
+                  className="w-full p-3.5 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#F5B716] transition-all"
+                />
+              </div>
+
+              {/* Consent */}
+              <label className="flex items-start gap-3 cursor-pointer pt-1">
                 <input
-                  type="email"
+                  type="checkbox"
                   required
-                  placeholder="votre.email@domaine.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#F5B716]"
+                  checked={formData.consent}
+                  onChange={(e) => setFormData({ ...formData, consent: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-[#F5B716] focus:ring-[#F5B716]"
                 />
-              </div>
-            </div>
+                <span className="text-xs text-slate-600 leading-relaxed">
+                  J'accepte que les informations saisies soient traitées par <strong>FormaSEO.ma</strong> pour me recontacter dans le cadre de ma demande de formation ou d'information.
+                </span>
+              </label>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Téléphone / WhatsApp</label>
-                <input
-                  type="tel"
-                  placeholder="+212 6 XX XX XX XX"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#F5B716]"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Formation d'intérêt</label>
-                <select
-                  value={formData.serviceInterest}
-                  onChange={(e) => setFormData({ ...formData, serviceInterest: e.target.value })}
-                  className="w-full p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#F5B716] cursor-pointer"
-                >
-                  <option value="SEO Débutant">SEO Débutant</option>
-                  <option value="SEO Avancé">SEO Avancé</option>
-                  <option value="Rédaction SEO & IA">Rédaction SEO & IA</option>
-                  <option value="SEO Business & E-commerce">SEO Business & E-commerce</option>
-                  <option value="Pass Illimité">Pass Illimité Académie</option>
-                  <option value="Formation Entreprise">Formation Sur-Mesure Entreprise</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Votre Message / Votre Site Web *</label>
-              <textarea
-                required
-                rows={4}
-                placeholder="Parlez-nous de votre situation, de votre site web ou de vos attentes..."
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#F5B716]"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 bg-[#F5B716] hover:bg-[#E0A30B] text-slate-950 font-black rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2"
-            >
-              <span>{loading ? 'Envoi en cours...' : 'Envoyer ma demande'}</span>
-              <Send className="w-4 h-4" />
-            </button>
-          </form>
-        </div>
-
-        {/* Right Column: Contact Details & Fast WhatsApp (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
-          
-          {/* Quick WhatsApp Box */}
-          <div className="bg-emerald-950 text-white rounded-3xl p-8 border border-emerald-800 relative overflow-hidden shadow-lg">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                <MessageCircle className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="font-bold text-white text-base">Assistance WhatsApp Directe</h3>
-                <p className="text-xs text-emerald-300">Réponse quasi-instantanée</p>
-              </div>
-            </div>
-            <p className="text-xs text-slate-300 leading-relaxed mb-6">
-              Discutez directement avec un conseiller pour tester votre éligibilité ou poser vos questions techniques.
-            </p>
-            <a
-              href="https://wa.me/212522408090"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center justify-center w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-full text-xs transition-all"
-            >
-              Ouvrir WhatsApp (+212 5 22 40 80 90)
-            </a>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-4 rounded-full bg-[#F5B716] hover:bg-[#E0A30B] disabled:opacity-50 text-slate-950 font-black text-sm transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {loading ? (
+                  <span>Envoi en cours...</span>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>Envoyer ma candidature / demande</span>
+                  </>
+                )}
+              </button>
+            </form>
           </div>
 
-          {/* Contact Details */}
-          <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6 text-sm text-slate-700">
-            <h3 className="font-black text-slate-900 text-lg">Nos Coordonnées</h3>
+          {/* Right Column: Contact Details & Guarantee */}
+          <div className="lg:col-span-4 space-y-6">
+            <div className="bg-[#082238] text-white rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-[#F5B716] uppercase tracking-wider">
+                  Informations Pratiques
+                </span>
+                <h3 className="text-xl font-black">
+                  FormaSEO.ma Casablanca
+                </h3>
+              </div>
 
-            <div className="flex items-start gap-3.5">
-              <MapPin className="w-5 h-5 text-[#F5B716] shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold text-slate-900 text-xs">Siège Principal & Studios</p>
-                <p className="text-xs text-slate-500">Boulevard des Almohades, Marina Business Center, Tour Ivoire, Casablanca, Maroc</p>
+              <div className="space-y-4 text-xs sm:text-sm text-slate-300">
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-5 h-5 text-[#F5B716] shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white block">Emplacement des sessions :</strong>
+                    <span>{settings?.address || 'Quartier Avenue Mers Sultan, Casablanca 20250, Maroc'}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Clock className="w-5 h-5 text-[#F5B716] shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white block">Horaires & Sessions :</strong>
+                    <span>Formations en soirée, le week-end ou en journée selon la session.</span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Mail className="w-5 h-5 text-[#F5B716] shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white block">Courriel de contact :</strong>
+                    <span>{settings?.email || 'contact@formaseo.ma'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-700/80 text-xs text-slate-300 space-y-1">
+                <div className="font-bold text-[#F5B716]">Processus d'admission :</div>
+                <div>1. Réception de votre formulaire</div>
+                <div>2. Entretien d'évaluation d'objectifs (15 min)</div>
+                <div>3. Confirmation de place & accueil sur la session</div>
               </div>
             </div>
 
-            <div className="flex items-start gap-3.5">
-              <Phone className="w-5 h-5 text-[#F5B716] shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold text-slate-900 text-xs">Téléphone</p>
-                <p className="text-xs text-slate-500">+212 (0)5 22 40 80 90</p>
+            {/* Privacy note */}
+            <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-2">
+              <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-slate-700" />
+                Protection de vos données
               </div>
-            </div>
-
-            <div className="flex items-start gap-3.5">
-              <Mail className="w-5 h-5 text-[#F5B716] shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold text-slate-900 text-xs">Email</p>
-                <p className="text-xs text-slate-500">contact@formaseo.ma</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3.5 pt-4 border-t border-slate-100">
-              <Clock className="w-5 h-5 text-[#F5B716] shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold text-slate-900 text-xs">Horaires d'ouverture</p>
-                <p className="text-xs text-slate-500">Lundi au Vendredi : 09h00 - 18h30 (GMT+1)</p>
-              </div>
+              <p>
+                Vos coordonnées ne sont jamais cédées ni vendues à des tiers. Elles sont uniquement utilisées par notre équipe pour vous assister.
+              </p>
             </div>
           </div>
 
         </div>
-
-      </div>
+      </section>
 
     </div>
   );

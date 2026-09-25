@@ -1,234 +1,148 @@
-import { Course, Category, Article, Review, User, Stats } from '../types';
+import { useState, useEffect } from 'react';
+import { AcademySettings, CurriculumWeek, FaqItem, Enquiry, Course, Category, Review, Article, User, Stats } from '../types';
+import { fallbackSettings, fallbackCurriculum, fallbackFaqs } from '../config/defaultData';
 
 const API_BASE = '/api';
 
 export const api = {
-  // Categories
-  async getCategories(): Promise<Category[]> {
+  // Settings
+  async getSettings(): Promise<AcademySettings> {
     try {
-      const res = await fetch(`${API_BASE}/categories`);
+      const res = await fetch(`${API_BASE}/settings`);
       if (!res.ok) throw new Error('API Error');
       const data = await res.json();
       return data.data;
     } catch (e) {
-      console.warn('API fallback for categories', e);
+      console.warn('API fallback for settings', e);
+      return fallbackSettings;
+    }
+  },
+
+  async updateSettings(settings: Partial<AcademySettings>): Promise<AcademySettings | null> {
+    try {
+      const res = await fetch(`${API_BASE}/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      });
+      const data = await res.json();
+      return data.data;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  // Curriculum
+  async getCurriculum(): Promise<CurriculumWeek[]> {
+    try {
+      const res = await fetch(`${API_BASE}/curriculum`);
+      if (!res.ok) throw new Error('API Error');
+      const data = await res.json();
+      return data.data;
+    } catch (e) {
+      console.warn('API fallback for curriculum', e);
+      return fallbackCurriculum;
+    }
+  },
+
+  async updateCurriculumWeek(weekNumber: number, updates: Partial<CurriculumWeek>): Promise<CurriculumWeek | null> {
+    try {
+      const res = await fetch(`${API_BASE}/curriculum/${weekNumber}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      const data = await res.json();
+      return data.data;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  // FAQs
+  async getFaqs(): Promise<FaqItem[]> {
+    try {
+      const res = await fetch(`${API_BASE}/faqs`);
+      if (!res.ok) throw new Error('API Error');
+      const data = await res.json();
+      return data.data;
+    } catch (e) {
+      return fallbackFaqs;
+    }
+  },
+
+  // Enquiries & Applications
+  async getEnquiries(): Promise<Enquiry[]> {
+    try {
+      const res = await fetch(`${API_BASE}/enquiries`);
+      if (!res.ok) throw new Error('API Error');
+      const data = await res.json();
+      return data.data;
+    } catch (e) {
       return [];
     }
   },
 
-  // Courses
-  async getCourses(params?: { category?: string; level?: string; search?: string }): Promise<Course[]> {
+  async submitEnquiry(payload: {
+    fullName: string;
+    email: string;
+    phone: string;
+    audience?: string;
+    preferredFormat?: 'presential' | 'online' | 'hybrid' | 'presentiel_casablanca' | 'en_ligne' | 'flexible';
+    goal?: string;
+    projectDescription?: string;
+    type?: 'programme' | 'candidature' | 'contact';
+    consentGiven?: boolean;
+  }) {
     try {
-      const query = new URLSearchParams();
-      if (params?.category) query.append('category', params.category);
-      if (params?.level) query.append('level', params.level);
-      if (params?.search) query.append('search', params.search);
-
-      const res = await fetch(`${API_BASE}/courses?${query.toString()}`);
-      if (!res.ok) throw new Error('API Error');
-      const data = await res.json();
-      return data.data;
-    } catch (e) {
-      console.warn('API fallback for courses', e);
-      return [];
-    }
-  },
-
-  async getCourseBySlug(slug: string): Promise<Course | null> {
-    try {
-      const res = await fetch(`${API_BASE}/courses/${slug}`);
-      if (!res.ok) throw new Error('API Error');
-      const data = await res.json();
-      return data.data;
-    } catch (e) {
-      console.warn('API fallback for course detail', e);
-      return null;
-    }
-  },
-
-  // Articles
-  async getArticles(search?: string): Promise<Article[]> {
-    try {
-      const query = search ? `?search=${encodeURIComponent(search)}` : '';
-      const res = await fetch(`${API_BASE}/articles${query}`);
-      if (!res.ok) throw new Error('API Error');
-      const data = await res.json();
-      return data.data;
-    } catch (e) {
-      console.warn('API fallback for articles', e);
-      return [];
-    }
-  },
-
-  async getArticleBySlug(slug: string): Promise<Article | null> {
-    try {
-      const res = await fetch(`${API_BASE}/articles/${slug}`);
-      if (!res.ok) throw new Error('API Error');
-      const data = await res.json();
-      return data.data;
-    } catch (e) {
-      return null;
-    }
-  },
-
-  // Reviews
-  async getReviews(courseId?: string): Promise<Review[]> {
-    try {
-      const query = courseId ? `?courseId=${courseId}` : '';
-      const res = await fetch(`${API_BASE}/reviews${query}`);
-      if (!res.ok) throw new Error('API Error');
-      const data = await res.json();
-      return data.data;
-    } catch (e) {
-      return [];
-    }
-  },
-
-  async addReview(review: { courseId: string; userName: string; userRole?: string; rating: number; comment: string }): Promise<Review | null> {
-    try {
-      const res = await fetch(`${API_BASE}/reviews`, {
+      const res = await fetch(`${API_BASE}/enquiries`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(review),
-      });
-      const data = await res.json();
-      return data.data;
-    } catch (e) {
-      return null;
-    }
-  },
-
-  // Auth & User
-  async getCurrentUser(token?: string): Promise<User | null> {
-    try {
-      const res = await fetch(`${API_BASE}/auth/me`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      if (!res.ok) return null;
-      const data = await res.json();
-      return data.data;
-    } catch (e) {
-      return null;
-    }
-  },
-
-  async login(email: string, password?: string): Promise<{ user: User; token: string } | null> {
-    try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      if (!res.ok) return null;
-      const data = await res.json();
-      return { user: data.data, token: data.token };
-    } catch (e) {
-      return null;
-    }
-  },
-
-  async register(name: string, email: string, password?: string): Promise<{ user: User; token: string } | null> {
-    try {
-      const res = await fetch(`${API_BASE}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
-      });
-      if (!res.ok) return null;
-      const data = await res.json();
-      return { user: data.data, token: data.token };
-    } catch (e) {
-      return null;
-    }
-  },
-
-  // Enrollments
-  async enroll(courseId: string, userId?: string): Promise<User | null> {
-    try {
-      const res = await fetch(`${API_BASE}/enrollments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseId, userId }),
-      });
-      const data = await res.json();
-      return data.data;
-    } catch (e) {
-      return null;
-    }
-  },
-
-  async toggleLesson(lessonId: string, userId?: string): Promise<User | null> {
-    try {
-      const res = await fetch(`${API_BASE}/enrollments/toggle-lesson`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lessonId, userId }),
-      });
-      const data = await res.json();
-      return data.data;
-    } catch (e) {
-      return null;
-    }
-  },
-
-  // Contact / Audit
-  async sendContact(payload: { name: string; email: string; phone?: string; subject?: string; message: string; serviceInterest?: string }) {
-    try {
-      const res = await fetch(`${API_BASE}/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          name: payload.fullName,
+          email: payload.email,
+          phone: payload.phone,
+          profileType: payload.audience || 'autre',
+          preferredFormat: payload.preferredFormat || 'presentiel_casablanca',
+          goal: payload.goal || payload.projectDescription || 'Demande information',
+          consent: payload.consentGiven ?? true,
+        }),
       });
       return await res.json();
     } catch (e) {
-      return { success: false, message: 'Erreur de connexion' };
-    }
-  },
-
-  // Stats
-  async getStats(): Promise<Stats> {
-    try {
-      const res = await fetch(`${API_BASE}/stats`);
-      const data = await res.json();
-      return data.data;
-    } catch (e) {
       return {
-        totalStudents: 2850,
-        satisfactionRate: 98.4,
-        totalHoursTraining: 120,
-        certificationsIssued: 1940,
-        partnerCompanies: 65,
+        success: false,
+        message: 'Impossible de contacter le serveur pour l’instant. Veuillez réessayer.',
       };
     }
   },
 
-  // Admin APIs
-  async getAdminOverview() {
-    try {
-      const res = await fetch(`${API_BASE}/admin/overview`);
-      const data = await res.json();
-      return data.data;
-    } catch (e) {
-      return null;
-    }
+  async sendEnquiry(payload: {
+    name: string;
+    email: string;
+    phone: string;
+    profileType: string;
+    goal: string;
+    preferredFormat: string;
+    consent: boolean;
+  }) {
+    return this.submitEnquiry({
+      fullName: payload.name,
+      email: payload.email,
+      phone: payload.phone,
+      audience: payload.profileType,
+      goal: payload.goal,
+      preferredFormat: payload.preferredFormat as any,
+      consentGiven: payload.consent,
+    });
   },
 
-  async getAdminContacts() {
+  async updateEnquiryStatus(id: string, status: string, notes?: string) {
     try {
-      const res = await fetch(`${API_BASE}/admin/contacts`);
-      const data = await res.json();
-      return data.data || [];
-    } catch (e) {
-      return [];
-    }
-  },
-
-  async updateContactStatus(id: string, status: string) {
-    try {
-      const res = await fetch(`${API_BASE}/admin/contacts/${id}`, {
+      const res = await fetch(`${API_BASE}/enquiries/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ status, notes }),
       });
       return await res.json();
     } catch (e) {
@@ -236,85 +150,151 @@ export const api = {
     }
   },
 
-  async getAdminUsers(): Promise<User[]> {
+  // Checklist
+  async getChecklist(): Promise<any[]> {
     try {
-      const res = await fetch(`${API_BASE}/admin/users`);
+      const res = await fetch(`${API_BASE}/checklist`);
+      if (!res.ok) throw new Error('API Error');
       const data = await res.json();
-      return data.data || [];
+      return data.data;
     } catch (e) {
       return [];
     }
   },
 
-  async createCourse(courseData: any): Promise<Course | null> {
+  async updateChecklist(id: string, status: string, notes?: string) {
     try {
-      const res = await fetch(`${API_BASE}/admin/courses`, {
-        method: 'POST',
+      const res = await fetch(`${API_BASE}/checklist/${id}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(courseData),
+        body: JSON.stringify({ status, notes }),
       });
-      const data = await res.json();
-      return data.data;
+      return await res.json();
     } catch (e) {
-      return null;
+      return { success: false };
     }
   },
 
-  async updateCourse(id: string, courseData: any): Promise<Course | null> {
-    try {
-      const res = await fetch(`${API_BASE}/admin/courses/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(courseData),
-      });
-      const data = await res.json();
-      return data.data;
-    } catch (e) {
-      return null;
-    }
+  // Backward compatibility helpers
+  async getCourses(params?: any): Promise<Course[]> {
+    return [];
   },
 
-  async deleteCourse(id: string): Promise<boolean> {
-    try {
-      const res = await fetch(`${API_BASE}/admin/courses/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      return data.success;
-    } catch (e) {
-      return false;
-    }
+  async getCourseBySlug(slug: string): Promise<Course | null> {
+    return null;
   },
 
-  async deleteReview(id: string): Promise<boolean> {
-    try {
-      const res = await fetch(`${API_BASE}/admin/reviews/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      return data.success;
-    } catch (e) {
-      return false;
-    }
+  async getCategories(): Promise<Category[]> {
+    return [];
   },
 
-  async createBlogArticle(artData: any): Promise<Article | null> {
-    try {
-      const res = await fetch(`${API_BASE}/admin/articles`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(artData),
-      });
-      const data = await res.json();
-      return data.data;
-    } catch (e) {
-      return null;
-    }
+  async getReviews(courseId?: string): Promise<Review[]> {
+    return [];
   },
 
-  async deleteBlogArticle(id: string): Promise<boolean> {
-    try {
-      const res = await fetch(`${API_BASE}/admin/articles/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      return data.success;
-    } catch (e) {
-      return false;
-    }
+  async addReview(review: any): Promise<any> {
+    return { success: true };
+  },
+
+  async getArticles(search?: string): Promise<Article[]> {
+    return [];
+  },
+
+  async getArticleBySlug(slug: string): Promise<any | null> {
+    return null;
+  },
+
+  async getAdminContacts(): Promise<any[]> {
+    return [];
+  },
+
+  async getAdminUsers(): Promise<User[]> {
+    return [];
+  },
+
+  async getStats(): Promise<Stats> {
+    return {
+      totalStudents: 0,
+      satisfactionRate: 100,
+      totalHoursTraining: 40,
+      certificationsIssued: 0,
+      partnerCompanies: 0,
+    };
+  },
+
+  async getCurrentUser(token?: string): Promise<User | null> {
+    return null;
+  },
+
+  async login(email: string, password?: string): Promise<{ user: User; token: string } | null> {
+    return null;
+  },
+
+  async register(name: string, email: string, password?: string): Promise<{ user: User; token: string } | null> {
+    return null;
+  },
+
+  async enrollInCourse(courseId: string, userId?: string): Promise<boolean> {
+    return true;
+  },
+
+  async toggleLesson(lessonId: string, userId?: string): Promise<boolean> {
+    return true;
+  },
+
+  async sendContact(data: any): Promise<{ success: boolean; message: string }> {
+    const res = await this.submitEnquiry({
+      fullName: data.name,
+      email: data.email,
+      phone: data.phone || '',
+      goal: data.message || data.subject,
+      projectDescription: data.message,
+      type: 'contact',
+      consentGiven: true,
+    });
+    return { success: res.success ?? true, message: 'Votre message a bien été transmis.' };
   },
 };
+
+// React Custom Hooks
+export function useAcademySettings() {
+  const [data, setData] = useState<AcademySettings>(fallbackSettings);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    api.getSettings().then((res) => {
+      if (res) setData(res);
+      setIsLoading(false);
+    });
+  }, []);
+
+  return { data, isLoading };
+}
+
+export function useCurriculum() {
+  const [data, setData] = useState<CurriculumWeek[]>(fallbackCurriculum);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    api.getCurriculum().then((res) => {
+      if (res) setData(res);
+      setIsLoading(false);
+    });
+  }, []);
+
+  return { data, isLoading };
+}
+
+export function useFaqs() {
+  const [data, setData] = useState<FaqItem[]>(fallbackFaqs);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    api.getFaqs().then((res) => {
+      if (res) setData(res);
+      setIsLoading(false);
+    });
+  }, []);
+
+  return { data, isLoading };
+}
