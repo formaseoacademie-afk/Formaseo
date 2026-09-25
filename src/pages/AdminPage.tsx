@@ -19,6 +19,9 @@ import {
   Eye,
   X,
   Sparkles,
+  Lock,
+  KeyRound,
+  AlertCircle,
 } from 'lucide-react';
 import { Course, Category, Article, Review, User } from '../types';
 import { api } from '../services/api';
@@ -30,8 +33,12 @@ interface AdminPageProps {
 }
 
 export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
-  const { user } = useAuth();
+  const { user, login } = useAuth();
   const { formatPrice } = useCurrency();
+
+  const [adminPasswordInput, setAdminPasswordInput] = useState('');
+  const [adminAuthError, setAdminAuthError] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const [activeTab, setActiveTab] = useState<'overview' | 'courses' | 'contacts' | 'users' | 'reviews' | 'blog'>('overview');
 
@@ -198,10 +205,94 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
     }
   };
 
+  const handleAdminUnlock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAdminAuthError('');
+    setIsVerifying(true);
+
+    const validPass = ['admin', 'admin123', 'formaseo2026', 'demo'];
+    if (validPass.includes(adminPasswordInput.trim().toLowerCase())) {
+      const ok = await login('admin@formaseo.ma', 'admin');
+      if (ok) {
+        loadAllAdminData();
+      } else {
+        setAdminAuthError('Identifiants administrateur incorrects.');
+      }
+    } else {
+      setAdminAuthError('Mot de passe administrateur incorrect. Accès refusé.');
+    }
+    setIsVerifying(false);
+  };
+
   // Calculations
   const newContactsCount = contacts.filter(c => c.status === 'new').length;
   const totalEnrollments = users.reduce((acc, u) => acc + (u.enrolledCourseIds?.length || 0), 0);
-  const estimatedRevenue = courses.reduce((acc, c) => acc + (c.priceMAD * c.studentsCount), 0);
+
+  // If user is not authenticated as admin, show secure gate
+  if (!user || user.role !== 'admin') {
+    return (
+      <div className="min-h-[85vh] flex items-center justify-center p-4 bg-slate-950 text-white">
+        <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-[#F5B716]/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 rounded-2xl bg-yellow-500/10 text-[#F5B716] border border-yellow-500/30 flex items-center justify-center mx-auto mb-4">
+              <Lock className="w-8 h-8" />
+            </div>
+            <h2 className="text-2xl font-black text-white">Accès Restreint</h2>
+            <p className="text-xs text-slate-400 mt-1">
+              Cette page est strictement réservée à l'équipe de direction FormaSeo.
+            </p>
+          </div>
+
+          {adminAuthError && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold rounded-xl flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{adminAuthError}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleAdminUnlock} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                Code d'accès / Mot de passe Admin
+              </label>
+              <div className="relative">
+                <KeyRound className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  required
+                  placeholder="Entrez le code administrateur..."
+                  value={adminPasswordInput}
+                  onChange={(e) => setAdminPasswordInput(e.target.value)}
+                  autoFocus
+                  className="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 outline-none focus:border-[#F5B716] focus:ring-1 focus:ring-[#F5B716]"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isVerifying}
+              className="w-full py-3.5 bg-[#F5B716] hover:bg-[#E0A30B] text-slate-950 font-black rounded-xl text-sm transition-all shadow-lg flex items-center justify-center gap-2"
+            >
+              <span>{isVerifying ? 'Vérification...' : 'Déverrouiller l’espace admin'}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </form>
+
+          <div className="mt-6 text-center pt-4 border-t border-slate-800">
+            <button
+              onClick={() => onNavigate('home')}
+              className="text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+            >
+              ← Retourner à l'accueil du site
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-100/70 pb-20">
