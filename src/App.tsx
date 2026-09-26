@@ -4,24 +4,79 @@ import { Footer } from './components/common/Footer';
 import { ApplicationModal } from './components/common/ApplicationModal';
 
 import { HomePage } from './pages/HomePage';
-import { FormationPage } from './pages/FormationPage';
+import { FormationDigitalPage } from './pages/FormationDigitalPage';
+import { FormationSeoPage } from './pages/FormationSeoPage';
+import { FormationWordPressPage } from './pages/FormationWordPressPage';
 import { ProgrammePage } from './pages/ProgrammePage';
+import { ResourcesPage } from './pages/ResourcesPage';
 import { AboutPage } from './pages/AboutPage';
 import { FaqPage } from './pages/FaqPage';
 import { ContactPage } from './pages/ContactPage';
 import { AdminPage } from './pages/AdminPage';
 
-// Helper to determine initial page from URL
+// Helper to determine initial page from browser path
 const getPageFromPath = (): { page: string; param?: string } => {
   const path = window.location.pathname.toLowerCase();
   const hash = window.location.hash.toLowerCase().replace('#', '');
 
   if (path === '/admin' || hash === 'admin' || path.startsWith('/admin')) return { page: 'admin' };
-  if (path === '/formation' || path === '/formations' || hash === 'formation') return { page: 'formation' };
-  if (path === '/programme' || path === '/syllabus' || hash === 'programme') return { page: 'programme' };
-  if (path === '/about' || path === '/a-propos' || hash === 'about') return { page: 'about' };
-  if (path === '/faq' || path === '/questions' || hash === 'faq') return { page: 'faq' };
-  if (path === '/contact' || path === '/candidater' || hash === 'contact') return { page: 'contact' };
+  
+  // Flagship Marketing Digital Casablanca
+  if (
+    path === '/formation-marketing-digital-casablanca' ||
+    path === '/formation-marketing-digital-maroc' ||
+    path === '/formation' ||
+    path === '/formations' ||
+    hash === 'formation'
+  ) {
+    return { page: 'formation-marketing-digital-casablanca' };
+  }
+
+  // SEO Page
+  if (
+    path === '/formation-seo-casablanca' ||
+    path === '/formation-seo-maroc' ||
+    path === '/formation-seo' ||
+    path === '/cours-seo' ||
+    hash === 'seo'
+  ) {
+    return { page: 'formation-seo-casablanca' };
+  }
+
+  // WordPress Page
+  if (
+    path === '/formation-wordpress-casablanca' ||
+    path === '/formation-wordpress-maroc' ||
+    path === '/formation-wordpress' ||
+    hash === 'wordpress'
+  ) {
+    return { page: 'formation-wordpress-casablanca' };
+  }
+
+  // Programme
+  if (path === '/programme-5-semaines' || path === '/programme' || path === '/syllabus' || hash === 'programme') {
+    return { page: 'programme-5-semaines' };
+  }
+
+  // Resources
+  if (path === '/ressources-seo' || path === '/ressources' || path === '/guides' || hash === 'ressources') {
+    return { page: 'ressources-seo' };
+  }
+
+  // About
+  if (path === '/a-propos' || path === '/about' || hash === 'about') {
+    return { page: 'a-propos' };
+  }
+
+  // FAQ
+  if (path === '/faq' || path === '/questions' || hash === 'faq') {
+    return { page: 'faq' };
+  }
+
+  // Contact
+  if (path === '/contact' || path === '/candidater' || path === '/inscription' || hash === 'contact') {
+    return { page: 'contact' };
+  }
 
   return { page: 'home' };
 };
@@ -55,9 +110,12 @@ export const AppContent: React.FC = () => {
 
     let urlPath = '/';
     if (page === 'home') urlPath = '/';
-    else if (page === 'formation') urlPath = '/formation';
-    else if (page === 'programme') urlPath = '/programme';
-    else if (page === 'about') urlPath = '/about';
+    else if (page === 'formation' || page === 'formation-marketing-digital-casablanca') urlPath = '/formation-marketing-digital-casablanca';
+    else if (page === 'formation-seo-casablanca') urlPath = '/formation-seo-casablanca';
+    else if (page === 'formation-wordpress-casablanca') urlPath = '/formation-wordpress-casablanca';
+    else if (page === 'programme' || page === 'programme-5-semaines') urlPath = '/programme-5-semaines';
+    else if (page === 'ressources-seo') urlPath = '/ressources-seo';
+    else if (page === 'about' || page === 'a-propos') urlPath = '/a-propos';
     else if (page === 'faq') urlPath = '/faq';
     else if (page === 'contact') urlPath = '/contact';
     else if (page === 'admin') urlPath = '/admin';
@@ -65,7 +123,7 @@ export const AppContent: React.FC = () => {
     try {
       window.history.pushState(null, '', urlPath);
     } catch (e) {
-      // pushState fallback
+      // fallback
     }
 
     setCurrentPage(page);
@@ -94,21 +152,42 @@ export const AppContent: React.FC = () => {
           />
         )}
 
-        {currentPage === 'formation' && (
-          <FormationPage
+        {(currentPage === 'formation' || currentPage === 'formation-marketing-digital-casablanca') && (
+          <FormationDigitalPage
             onNavigate={handleNavigate}
             onOpenApplyModal={openApplyModal}
           />
         )}
 
-        {currentPage === 'programme' && (
+        {currentPage === 'formation-seo-casablanca' && (
+          <FormationSeoPage
+            onNavigate={handleNavigate}
+            onOpenApplyModal={openApplyModal}
+          />
+        )}
+
+        {currentPage === 'formation-wordpress-casablanca' && (
+          <FormationWordPressPage
+            onNavigate={handleNavigate}
+            onOpenApplyModal={openApplyModal}
+          />
+        )}
+
+        {(currentPage === 'programme' || currentPage === 'programme-5-semaines') && (
           <ProgrammePage
             onNavigate={handleNavigate}
             onOpenApplyModal={openApplyModal}
           />
         )}
 
-        {currentPage === 'about' && (
+        {currentPage === 'ressources-seo' && (
+          <ResourcesPage
+            onNavigate={handleNavigate}
+            onOpenApplyModal={openApplyModal}
+          />
+        )}
+
+        {(currentPage === 'about' || currentPage === 'a-propos') && (
           <AboutPage
             onNavigate={handleNavigate}
             onOpenApplyModal={openApplyModal}
@@ -134,7 +213,7 @@ export const AppContent: React.FC = () => {
       </main>
 
       {/* Footer (hidden in admin mode) */}
-      {!isAdmin && <Footer onNavigate={handleNavigate} />}
+      {!isAdmin && <Footer onNavigate={handleNavigate} onOpenApplyModal={openApplyModal} />}
 
       {/* Reusable Lead & Application Modal */}
       <ApplicationModal

@@ -3,14 +3,16 @@ import {
   HelpCircle, 
   ChevronDown, 
   ChevronUp, 
-  Sparkles, 
   ArrowRight, 
   MessageCircle, 
   FileText, 
   Search,
-  CheckCircle2
+  CheckCircle2,
+  ShieldCheck
 } from 'lucide-react';
 import { useFaqs } from '../services/api';
+import { SEOHead } from '../components/common/SEOHead';
+import { getBreadcrumbSchema } from '../config/seoSchemas';
 
 interface FaqPageProps {
   onNavigate: (page: string, param?: string) => void;
@@ -47,8 +49,19 @@ export const FaqPage: React.FC<FaqPageProps> = ({ onNavigate, onOpenApplyModal }
     return matchesCat && matchesSearch;
   });
 
+  const breadcrumbs = getBreadcrumbSchema([
+    { name: 'Accueil', url: '/' },
+    { name: 'Questions Fréquentes (FAQ)', url: '/faq' },
+  ]);
+
   return (
     <div className="space-y-16 pb-20">
+      <SEOHead
+        title="FAQ Formation SEO & WordPress Casablanca | FormaSEO.ma"
+        description="Trouvez les réponses à toutes vos questions sur la formation FormaSEO.ma : prérequis, tarifs, matériel inclus, sessions à Casablanca et distanciel."
+        canonicalPath="/faq"
+        schema={[breadcrumbs]}
+      />
       
       {/* Header Banner */}
       <section className="bg-[#082238] text-white py-16 sm:py-20 relative overflow-hidden border-b border-slate-800">
@@ -56,7 +69,7 @@ export const FaqPage: React.FC<FaqPageProps> = ({ onNavigate, onOpenApplyModal }
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-6">
           
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs text-[#F5B716] font-bold">
-            <Sparkles className="w-3.5 h-3.5" />
+            <HelpCircle className="w-3.5 h-3.5" />
             <span>Centre d'Aide & Questions Fréquentes</span>
           </div>
 

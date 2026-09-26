@@ -10,7 +10,6 @@ import {
   Layers, 
   Award, 
   Users, 
-  Sparkles, 
   ShieldCheck, 
   Compass, 
   ChevronRight,
@@ -37,7 +36,7 @@ export const FormationPage: React.FC<FormationPageProps> = ({ onNavigate, onOpen
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs text-[#F5B716] font-bold mb-6">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Award className="w-3.5 h-3.5" />
             <span>Formation Pratique Complète</span>
           </div>
 
@@ -374,7 +373,7 @@ export const FormationPage: React.FC<FormationPageProps> = ({ onNavigate, onOpen
                 Tout le nécessaire pour réussir votre projet
               </h2>
               <p className="text-sm text-slate-600">
-                Vous ne repartez pas seulement avec des connaissances : vous repartez avec un écosystème digital fonctionnel.
+                Vous ne repartez pas seulement avec des connaissances : vous repartez avec votre site web configuré et vos outils de mesure connectés.
               </p>
             </div>
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { HeroSection } from '../components/home/HeroSection';
+import { CategoryCardsSection } from '../components/home/CategoryCardsSection';
 import { AudiencesSection } from '../components/home/AudiencesSection';
 import { DeliverablesSection } from '../components/home/DeliverablesSection';
 import { CurriculumPreview } from '../components/home/CurriculumPreview';
@@ -8,6 +9,8 @@ import { HowItWorksSection } from '../components/home/HowItWorksSection';
 import { FounderSpotlight } from '../components/home/FounderSpotlight';
 import { FaqSection } from '../components/home/FaqSection';
 import { ApplicationFormSection } from '../components/home/ApplicationFormSection';
+import { SEOHead } from '../components/common/SEOHead';
+import { getOrganizationSchema, getLocalBusinessSchema } from '../config/seoSchemas';
 
 interface HomePageProps {
   onNavigate: (page: string, param?: string) => void;
@@ -15,15 +18,31 @@ interface HomePageProps {
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenApplyModal }) => {
+  const orgSchema = getOrganizationSchema();
+  const localSchema = getLocalBusinessSchema();
+
   return (
-    <div className="space-y-12 sm:space-y-16 pb-12">
+    <div className="space-y-6 sm:space-y-8 pb-12">
+      <SEOHead
+        title="FormaSEO.ma | Formation SEO & Marketing Digital à Casablanca"
+        description="Académie pratique de référencement naturel (SEO) et création de site WordPress à Casablanca. Apprenez en créant votre propre site et en le positionnant sur Google."
+        canonicalPath="/"
+        schema={[orgSchema, localSchema]}
+      />
+
       {/* 1. Hero Section */}
       <HeroSection
-        onExploreFormation={() => onNavigate('formation')}
+        onExploreFormation={() => onNavigate('formation-marketing-digital-casablanca')}
         onOpenApplyModal={onOpenApplyModal}
       />
 
-      {/* 2. Target Audiences */}
+      {/* 2. Category Cards Section ("Choisissez votre catégorie") */}
+      <CategoryCardsSection
+        onSelectCategory={(route) => onNavigate(route)}
+        onOpenApplyModal={onOpenApplyModal}
+      />
+
+      {/* 3. Target Audiences */}
       <AudiencesSection onOpenApplyModal={onOpenApplyModal} />
 
       {/* 3. Practical Deliverables: What Learners Build */}
@@ -31,7 +50,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenApplyModal
 
       {/* 4. 5-Week Curriculum Preview */}
       <CurriculumPreview
-        onExploreFullCurriculum={() => onNavigate('programme')}
+        onExploreFullCurriculum={() => onNavigate('programme-5-semaines')}
         onOpenApplyModal={onOpenApplyModal}
       />
 
@@ -42,7 +61,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenApplyModal
       <HowItWorksSection onOpenApplyModal={onOpenApplyModal} />
 
       {/* 7. Founder Spotlight (Wassim Kassy) */}
-      <FounderSpotlight onLearnMore={() => onNavigate('about')} />
+      <FounderSpotlight onLearnMore={() => onNavigate('a-propos')} />
 
       {/* 8. FAQ Section */}
       <FaqSection

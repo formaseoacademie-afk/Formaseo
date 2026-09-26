@@ -56,12 +56,46 @@ app.put('/api/curriculum/:weekNumber', (req, res) => {
   }
 });
 
-// 3. FAQs
+// 3. FAQs CRUD
 app.get('/api/faqs', (req, res) => {
   try {
     res.json({ success: true, data: db.getFaqs() });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Erreur FAQs' });
+  }
+});
+
+app.post('/api/faqs', (req, res) => {
+  try {
+    const { question, answer, category } = req.body;
+    if (!question || !answer) {
+      return res.status(400).json({ success: false, message: 'Question et réponse obligatoires' });
+    }
+    const newFaq = db.addFaq({ question, answer, category: category || 'Général' });
+    res.json({ success: true, data: newFaq });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur ajout FAQ' });
+  }
+});
+
+app.put('/api/faqs/:id', (req, res) => {
+  try {
+    const updated = db.updateFaq(req.params.id, req.body);
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'FAQ introuvable' });
+    }
+    res.json({ success: true, data: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur modification FAQ' });
+  }
+});
+
+app.delete('/api/faqs/:id', (req, res) => {
+  try {
+    const ok = db.deleteFaq(req.params.id);
+    res.json({ success: ok });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur suppression FAQ' });
   }
 });
 
@@ -131,7 +165,35 @@ app.patch('/api/enquiries/:id', (req, res) => {
   }
 });
 
+app.delete('/api/enquiries/:id', (req, res) => {
+  try {
+    const ok = db.deleteEnquiry(req.params.id);
+    res.json({ success: ok });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur suppression candidature' });
+  }
+});
+
 // 5. Owner Checklist
+app.get('/api/checklist', (req, res) => {
+  try {
+    res.json({ success: true, data: db.getChecklist() });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur checklist' });
+  }
+});
+
+app.post('/api/checklist', (req, res) => {
+  try {
+    const { label, category } = req.body;
+    if (!label) return res.status(400).json({ success: false, message: 'Libellé obligatoire' });
+    const item = db.addChecklistItem(label, category);
+    res.json({ success: true, data: item });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur ajout checklist' });
+  }
+});
+
 app.patch('/api/checklist/:id', (req, res) => {
   try {
     const { status, notes } = req.body;
@@ -142,9 +204,44 @@ app.patch('/api/checklist/:id', (req, res) => {
   }
 });
 
+app.delete('/api/checklist/:id', (req, res) => {
+  try {
+    const ok = db.deleteChecklistItem(req.params.id);
+    res.json({ success: ok });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur suppression checklist' });
+  }
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', academy: 'FormaSEO.ma', timestamp: new Date().toISOString() });
+});
+
+// Migration 301 Permanent Redirects (Old URLs -> New Canonical Architecture)
+const redirectMap: Record<string, string> = {
+  '/formation-marketing-digital-maroc': '/formation-marketing-digital-casablanca',
+  '/formation-seo-maroc': '/formation-seo-casablanca',
+  '/formation-seo': '/formation-seo-casablanca',
+  '/cours-seo': '/formation-seo-casablanca',
+  '/formation-wordpress-maroc': '/formation-wordpress-casablanca',
+  '/formation-wordpress': '/formation-wordpress-casablanca',
+  '/formation': '/formation-marketing-digital-casablanca',
+  '/formations': '/formation-marketing-digital-casablanca',
+  '/cours': '/formation-marketing-digital-casablanca',
+  '/programme': '/programme-5-semaines',
+  '/syllabus': '/programme-5-semaines',
+  '/about': '/a-propos',
+  '/a-propos': '/a-propos',
+  '/inscription': '/contact',
+  '/candidater': '/contact',
+  '/questions': '/faq',
+};
+
+Object.entries(redirectMap).forEach(([oldUrl, newUrl]) => {
+  app.get(oldUrl, (req, res) => {
+    res.redirect(301, newUrl);
+  });
 });
 
 // Serve frontend static build on all other paths

@@ -341,14 +341,75 @@ class Database {
     return item;
   }
 
-  updateChecklistItem(id: string, status: 'en_attente' | 'confirmé', notes?: string) {
+  getChecklist() {
+    return this.data.settings.ownerChecklist || [];
+  }
+
+  addChecklistItem(label: string, category: string = 'Lancement') {
+    if (!this.data.settings.ownerChecklist) this.data.settings.ownerChecklist = [];
+    const newItem = {
+      id: 'chk-' + Date.now(),
+      label,
+      category,
+      status: 'en_attente' as const,
+      notes: ''
+    };
+    this.data.settings.ownerChecklist.push(newItem);
+    this.saveData();
+    return newItem;
+  }
+
+  updateChecklistItem(id: string, status: 'en_attente' | 'confirmé' | 'approved' | 'pending', notes?: string) {
+    if (!this.data.settings.ownerChecklist) return [];
     const item = this.data.settings.ownerChecklist.find(c => c.id === id);
     if (item) {
-      item.status = status;
-      if (notes) item.notes = notes;
+      item.status = (status === 'approved' || status === 'confirmé') ? 'confirmé' : 'en_attente';
+      if (notes !== undefined) item.notes = notes;
       this.saveData();
     }
     return this.data.settings.ownerChecklist;
+  }
+
+  deleteChecklistItem(id: string) {
+    if (!this.data.settings.ownerChecklist) return false;
+    const initialLen = this.data.settings.ownerChecklist.length;
+    this.data.settings.ownerChecklist = this.data.settings.ownerChecklist.filter(c => c.id !== id);
+    this.saveData();
+    return this.data.settings.ownerChecklist.length < initialLen;
+  }
+
+  // FAQs CRUD
+  addFaq(faq: Omit<FaqItem, 'id'>): FaqItem {
+    const newFaq: FaqItem = {
+      ...faq,
+      id: 'faq-' + Date.now(),
+    };
+    this.data.faqs.push(newFaq);
+    this.saveData();
+    return newFaq;
+  }
+
+  updateFaq(id: string, updates: Partial<FaqItem>): FaqItem | null {
+    const idx = this.data.faqs.findIndex(f => f.id === id);
+    if (idx === -1) return null;
+    this.data.faqs[idx] = { ...this.data.faqs[idx], ...updates };
+    this.saveData();
+    return this.data.faqs[idx];
+  }
+
+  deleteFaq(id: string): boolean {
+    const initialLen = this.data.faqs.length;
+    this.data.faqs = this.data.faqs.filter(f => f.id !== id);
+    this.saveData();
+    return this.data.faqs.length < initialLen;
+  }
+
+  // Enquiries CRUD
+  deleteEnquiry(id: string): boolean {
+    const initialLen = this.data.enquiries.length;
+    this.data.enquiries = this.data.enquiries.filter(e => e.id !== id);
+    this.saveData();
+    return this.data.enquiries.length < initialLen;
   }
 }
 

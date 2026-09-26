@@ -7,14 +7,17 @@ import {
   Wrench, 
   ArrowRight, 
   FileText, 
-  Sparkles, 
+  BookOpen, 
   HelpCircle,
   AlertCircle,
   ExternalLink,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Laptop
 } from 'lucide-react';
 import { useCurriculum, useAcademySettings } from '../services/api';
+import { SEOHead } from '../components/common/SEOHead';
+import { getBreadcrumbSchema } from '../config/seoSchemas';
 
 interface ProgrammePageProps {
   onNavigate: (page: string, param?: string) => void;
@@ -30,8 +33,19 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({ onNavigate, onOpen
     setExpandedWeek(expandedWeek === num ? null : num);
   };
 
+  const breadcrumbs = getBreadcrumbSchema([
+    { name: 'Accueil', url: '/' },
+    { name: 'Programme 5 Semaines', url: '/programme-5-semaines' },
+  ]);
+
   return (
     <div className="space-y-16 pb-20">
+      <SEOHead
+        title="Programme Détaillé en 5 Semaines | Formation SEO & WordPress Casablanca"
+        description="Consultez le syllabus complet semaine par semaine : création WordPress, recherche de mots-clés, optimisation technique, SEO local et Google Analytics 4."
+        canonicalPath="/programme-5-semaines"
+        schema={[breadcrumbs]}
+      />
       
       {/* Header Banner */}
       <section className="bg-[#082238] text-white py-16 sm:py-20 relative overflow-hidden border-b border-slate-800">
@@ -39,7 +53,7 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({ onNavigate, onOpen
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs text-[#F5B716] font-bold mb-6">
-            <Sparkles className="w-3.5 h-3.5" />
+            <BookOpen className="w-3.5 h-3.5" />
             <span>Syllabus Pédagogique Détaillé</span>
           </div>
 
@@ -176,7 +190,7 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({ onNavigate, onOpen
                       <div className="lg:col-span-5 space-y-4">
                         <div className="p-5 rounded-2xl bg-amber-50 border border-amber-200/80 space-y-2">
                           <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
-                            <Sparkles className="w-3.5 h-3.5 text-[#F5B716]" />
+                            <Laptop className="w-3.5 h-3.5 text-[#F5B716]" />
                             Atelier Pratique & Livrable
                           </span>
                           <p className="text-xs sm:text-sm text-amber-950 font-bold leading-relaxed">

@@ -71,6 +71,44 @@ export const api = {
     }
   },
 
+  async addFaq(faq: { question: string; answer: string; category?: string }): Promise<FaqItem | null> {
+    try {
+      const res = await fetch(`${API_BASE}/faqs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(faq),
+      });
+      const data = await res.json();
+      return data.data;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  async updateFaq(id: string, updates: Partial<FaqItem>): Promise<FaqItem | null> {
+    try {
+      const res = await fetch(`${API_BASE}/faqs/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      const data = await res.json();
+      return data.data;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  async deleteFaq(id: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/faqs/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      return data.success;
+    } catch (e) {
+      return false;
+    }
+  },
+
   // Enquiries & Applications
   async getEnquiries(): Promise<Enquiry[]> {
     try {
@@ -150,6 +188,16 @@ export const api = {
     }
   },
 
+  async deleteEnquiry(id: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/enquiries/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      return data.success;
+    } catch (e) {
+      return false;
+    }
+  },
+
   // Checklist
   async getChecklist(): Promise<any[]> {
     try {
@@ -159,6 +207,20 @@ export const api = {
       return data.data;
     } catch (e) {
       return [];
+    }
+  },
+
+  async addChecklistItem(label: string, category?: string) {
+    try {
+      const res = await fetch(`${API_BASE}/checklist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ label, category }),
+      });
+      const data = await res.json();
+      return data.data;
+    } catch (e) {
+      return null;
     }
   },
 
@@ -172,6 +234,16 @@ export const api = {
       return await res.json();
     } catch (e) {
       return { success: false };
+    }
+  },
+
+  async deleteChecklistItem(id: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/checklist/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      return data.success;
+    } catch (e) {
+      return false;
     }
   },
 

@@ -1,0 +1,9 @@
+# robots.txt for FormaSEO.ma
+User-agent: *
+Allow: /
+
+# Protect admin dashboard & internal API endpoints from search engine indexing
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://formaseo.ma/sitemap.xml

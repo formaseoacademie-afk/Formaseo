@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, CheckCircle2, AlertCircle, ShieldCheck, Sparkles } from 'lucide-react';
+import { Send, CheckCircle2, AlertCircle, ShieldCheck } from 'lucide-react';
 import { api } from '../../services/api';
 
 export const ApplicationFormSection: React.FC = () => {
@@ -55,12 +55,67 @@ export const ApplicationFormSection: React.FC = () => {
         </div>
 
         {submitted ? (
-          <div className="p-8 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-3">
-            <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
-            <h3 className="text-xl font-black text-slate-900">Demande enregistrée avec succès !</h3>
-            <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto">
-              Merci <strong>{name}</strong>. Notre équipe pédagogique prendra contact avec vous sous 24h pour vous transmettre tous les détails de la formation.
-            </p>
+          <div className="p-8 sm:p-12 bg-emerald-50/80 rounded-3xl border border-emerald-200 text-center space-y-6 animate-in fade-in">
+            <div className="w-16 h-16 rounded-3xl bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-emerald-600/20">
+              <CheckCircle2 className="w-10 h-10" />
+            </div>
+
+            <div className="space-y-2">
+              <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-200/60 px-3 py-1 rounded-full">
+                Candidature Confirmée
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-black text-slate-900">
+                Merci {name || 'cher candidat'} !
+              </h3>
+              <p className="text-slate-600 text-sm sm:text-base max-w-lg mx-auto leading-relaxed">
+                Votre dossier a été transmis avec succès à l'équipe FormaSEO.ma. Le syllabus complet et les modalités vous sont envoyés par email & WhatsApp sous <strong>24h ouvrées</strong>.
+              </p>
+            </div>
+
+            {/* Next steps list */}
+            <div className="max-w-md mx-auto p-5 rounded-2xl bg-white border border-emerald-100 text-left space-y-3 shadow-xs text-xs sm:text-sm">
+              <h4 className="font-black text-slate-900 flex items-center gap-2 text-xs uppercase tracking-wider text-emerald-900">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                Ce qui va se passer ensuite :
+              </h4>
+              <div className="space-y-2 text-slate-700 text-xs">
+                <div className="flex items-start gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px] flex items-center justify-center shrink-0">1</span>
+                  <span>Réception de la brochure pédagogique détaillée et du calendrier</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px] flex items-center justify-center shrink-0">2</span>
+                  <span>Contact direct par un conseiller pour répondre à vos questions</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px] flex items-center justify-center shrink-0">3</span>
+                  <span>Validation de votre place pour la prochaine session</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <a
+                href="https://wa.me/212600000000?text=Bonjour%20FormaSEO%2C%20je%20viens%20de%20d%C3%A9poser%20ma%20candidature%20sur%20le%20site..."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto px-6 py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-colors"
+              >
+                <span>Une question ? Écrivez-nous sur WhatsApp</span>
+              </a>
+              <button
+                onClick={() => {
+                  setSubmitted(false);
+                  setName('');
+                  setEmail('');
+                  setPhone('');
+                  setGoal('');
+                }}
+                className="w-full sm:w-auto px-6 py-3 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs transition-colors"
+              >
+                Soumettre un autre dossier
+              </button>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">

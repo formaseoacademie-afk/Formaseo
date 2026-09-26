@@ -5,16 +5,18 @@ import {
   Users, 
   Globe, 
   ShieldCheck, 
-  Sparkles, 
   ArrowRight, 
   Laptop, 
   Compass, 
   Layers, 
   Info,
   CheckCircle2,
-  ExternalLink
+  ExternalLink,
+  Award
 } from 'lucide-react';
 import { Logo } from '../components/common/Logo';
+import { SEOHead } from '../components/common/SEOHead';
+import { getBreadcrumbSchema } from '../config/seoSchemas';
 import { useAcademySettings } from '../services/api';
 
 interface AboutPageProps {
@@ -25,8 +27,19 @@ interface AboutPageProps {
 export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, onOpenApplyModal }) => {
   const { data: settings } = useAcademySettings();
 
+  const breadcrumbs = getBreadcrumbSchema([
+    { name: 'Accueil', url: '/' },
+    { name: 'À Propos & Formateur', url: '/a-propos' },
+  ]);
+
   return (
     <div className="space-y-16 pb-20">
+      <SEOHead
+        title="À Propos de FormaSEO.ma | Formateur & Méthode SEO à Casablanca"
+        description="Découvrez l'histoire de FormaSEO.ma, notre formateur Wassim Kassy et notre méthodologie axée sur la pratique réelle et l'acquisition de trafic Google au Maroc."
+        canonicalPath="/a-propos"
+        schema={[breadcrumbs]}
+      />
       
       {/* Hero Header */}
       <section className="bg-[#082238] text-white py-16 sm:py-20 relative overflow-hidden border-b border-slate-800">
@@ -34,7 +47,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, onOpenApplyMod
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-6">
           
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs text-[#F5B716] font-bold">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Compass className="w-3.5 h-3.5" />
             <span>À Propos de FormaSEO.ma</span>
           </div>
 
@@ -180,13 +193,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, onOpenApplyMod
               <p>
                 Son approche pédagogique privilégie la mise en situation réelle : accompagner chaque participant dans la structuration d'un site WordPress, la compréhension fine des critères de classement Google, et l'acquisition durable de trafic sans artifice.
               </p>
-
-              <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/70 text-xs text-amber-950 flex items-start gap-2.5">
-                <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Note de transparence :</strong> Les détails biographiques et photographies officielles sont en cours de confirmation finale avec la direction avant publication intégrale.
-                </span>
-              </div>
             </div>
           </div>
 
@@ -208,8 +214,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, onOpenApplyMod
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                 Les sessions en présentiel se déroulent à Casablanca, dans le quartier central d'Avenue Mers Sultan. Les apprenants à distance ou situés dans d'autres villes du Maroc peuvent suivre l'intégralité du cursus en direct avec le même niveau d'encadrement.
               </p>
-              <div className="text-xs text-slate-400 font-medium">
-                📍 Repère indicatif : Quartier Avenue Mers Sultan, Casablanca, Maroc (adresse exacte communiquée à la convocation).
+              <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-[#F5B716] shrink-0" />
+                <span>Repère indicatif : Quartier Avenue Mers Sultan, Casablanca, Maroc (adresse exacte communiquée à la convocation).</span>
               </div>
             </div>
 

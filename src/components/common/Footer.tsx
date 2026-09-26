@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Mail, ShieldCheck, Sparkles, BookOpen, ArrowRight } from 'lucide-react';
+import { MapPin, ShieldCheck, ArrowRight, Phone, Mail } from 'lucide-react';
 import { Logo } from './Logo';
 
 interface FooterProps {
@@ -15,11 +15,19 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenApplyModal }) 
         {/* Top summary row */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 pb-12 border-b border-slate-800">
           <div className="lg:col-span-6 space-y-4">
-            <div onClick={() => onNavigate('home')} className="cursor-pointer inline-block">
-              <Logo />
-            </div>
+            <a
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('home');
+              }}
+              className="cursor-pointer inline-block"
+              title="FormaSEO.ma"
+            >
+              <Logo variant="light" />
+            </a>
             <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-md pt-2">
-              FormaSEO.ma propose une formation pratique à Casablanca axée sur la création de sites WordPress, le référencement naturel (SEO), la visibilité locale et la mesure des résultats.
+              FormaSEO.ma propose des formations pratiques à Casablanca axées sur le marketing digital, la création de sites WordPress, le référencement naturel (SEO) et la mesure de résultats réels.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 pt-2 text-xs text-slate-400">
               <span className="flex items-center gap-1.5">
@@ -28,7 +36,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenApplyModal }) 
               </span>
               <span className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-[#F5B716] shrink-0" />
-                Apprentissage sur projet réel
+                Projet web réel déployé
               </span>
             </div>
           </div>
@@ -42,7 +50,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenApplyModal }) 
                 Prêt à créer et référencer votre propre site web ?
               </h4>
               <p className="text-slate-300 text-xs mt-2 leading-relaxed">
-                Les inscriptions pour la prochaine session sont ouvertes. Déposez votre candidature pour être contacté par notre équipe.
+                Les inscriptions pour la prochaine session sont ouvertes. Déposez votre candidature pour échanger avec notre conseiller pédagogique.
               </p>
             </div>
 
@@ -57,12 +65,16 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenApplyModal }) 
                 </button>
               )}
 
-              <button
-                onClick={() => onNavigate('programme')}
-                className="px-5 py-2.5 rounded-full border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors cursor-pointer"
+              <a
+                href="/programme-5-semaines"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onNavigate('programme-5-semaines');
+                }}
+                className="px-5 py-2.5 rounded-full border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors cursor-pointer inline-flex items-center"
               >
                 <span>Découvrir le programme 5 semaines</span>
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -72,79 +84,156 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenApplyModal }) 
           
           <div className="space-y-3">
             <h5 className="font-extrabold uppercase tracking-wider text-[#F5B716] text-[11px]">
-              Formation
+              Formations & Cursus
             </h5>
             <ul className="space-y-2 text-slate-300">
               <li>
-                <button onClick={() => onNavigate('formation')} className="hover:text-white transition-colors">
-                  Présentation de la Formation
-                </button>
+                <a
+                  href="/formation-marketing-digital-casablanca"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('formation-marketing-digital-casablanca');
+                  }}
+                  className="hover:text-white transition-colors"
+                >
+                  Formation Marketing Digital (Casablanca)
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('programme')} className="hover:text-white transition-colors">
-                  Programme Semaine par Semaine
-                </button>
+                <a
+                  href="/formation-seo-casablanca"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('formation-seo-casablanca');
+                  }}
+                  className="hover:text-white transition-colors"
+                >
+                  Formation SEO & Référencement Google
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('formation')} className="hover:text-white transition-colors">
-                  Inclusions (WordPress, Hébergement)
-                </button>
+                <a
+                  href="/formation-wordpress-casablanca"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('formation-wordpress-casablanca');
+                  }}
+                  className="hover:text-white transition-colors"
+                >
+                  Formation WordPress & Création de Site
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('formation')} className="hover:text-white transition-colors">
-                  Prérequis & Profils Cibles
-                </button>
+                <a
+                  href="/programme-5-semaines"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('programme-5-semaines');
+                  }}
+                  className="hover:text-white transition-colors"
+                >
+                  Programme Détaillé 5 Semaines
+                </a>
               </li>
             </ul>
           </div>
 
           <div className="space-y-3">
             <h5 className="font-extrabold uppercase tracking-wider text-[#F5B716] text-[11px]">
-              L'Académie
+              L'Académie & Guides
             </h5>
             <ul className="space-y-2 text-slate-300">
               <li>
-                <button onClick={() => onNavigate('about')} className="hover:text-white transition-colors">
+                <a
+                  href="/a-propos"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('a-propos');
+                  }}
+                  className="hover:text-white transition-colors"
+                >
                   À Propos de FormaSEO.ma
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('about')} className="hover:text-white transition-colors">
-                  Méthodologie Pédagogique
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('about')} className="hover:text-white transition-colors">
+                <a
+                  href="/a-propos"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('a-propos');
+                  }}
+                  className="hover:text-white transition-colors"
+                >
                   Formateur (Wassim Kassy)
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('about')} className="hover:text-white transition-colors">
-                  Emplacement Casablanca
-                </button>
+                <a
+                  href="/ressources-seo"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('ressources-seo');
+                  }}
+                  className="hover:text-white transition-colors"
+                >
+                  Guides & Tutoriels SEO Maroc
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/contact"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('contact');
+                  }}
+                  className="hover:text-white transition-colors"
+                >
+                  Centre Casablanca (Mers Sultan)
+                </a>
               </li>
             </ul>
           </div>
 
           <div className="space-y-3">
             <h5 className="font-extrabold uppercase tracking-wider text-[#F5B716] text-[11px]">
-              Admissions & Aide
+              Admissions & Contact
             </h5>
             <ul className="space-y-2 text-slate-300">
               <li>
-                <button onClick={() => onNavigate('contact')} className="hover:text-white transition-colors">
+                <a
+                  href="/contact"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('contact');
+                  }}
+                  className="hover:text-white transition-colors"
+                >
                   Déposer une Candidature
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('faq')} className="hover:text-white transition-colors">
+                <a
+                  href="/faq"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('faq');
+                  }}
+                  className="hover:text-white transition-colors"
+                >
                   Foire Aux Questions (FAQ)
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('contact')} className="hover:text-white transition-colors">
-                  Contacter l'Équipe
-                </button>
+                <a
+                  href="/contact"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('contact');
+                  }}
+                  className="hover:text-white transition-colors"
+                >
+                  Contacter par WhatsApp / Téléphone
+                </a>
               </li>
             </ul>
           </div>
@@ -154,10 +243,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenApplyModal }) 
               Transparence & Mentions
             </h5>
             <p className="text-slate-400 text-[11px] leading-relaxed">
-              FormaSEO.ma • Académie de formation pratique au SEO et marketing digital basée à Casablanca, Maroc.
+              FormaSEO.ma • Académie de formation pratique au SEO, marketing digital et création de site WordPress basée à Casablanca, Maroc.
             </p>
             <div className="text-[10px] text-slate-500">
-              * Ce site concerne formaseo.ma (Maroc) et n'a aucun lien avec formaseo.fr.
+              * Ce site officiel concerne l'académie marocaine formaseo.ma.
             </div>
           </div>
 
@@ -169,7 +258,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenApplyModal }) 
             © {new Date().getFullYear()} FormaSEO.ma. Tous droits réservés. Casablanca, Maroc.
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-slate-500">Formation 100% pratique sur projet réel</span>
+            <span className="text-slate-500">Apprentissage pratique sur projet réel</span>
           </div>
         </div>
 

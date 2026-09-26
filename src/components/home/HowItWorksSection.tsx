@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users2, Laptop2, HelpCircle, CheckCircle, MapPin, Sparkles, ArrowRight } from 'lucide-react';
+import { Users2, Laptop2, HelpCircle, CheckCircle, MapPin, ArrowRight } from 'lucide-react';
 
 interface HowItWorksSectionProps {
   onOpenApplyModal?: (intent?: 'programme' | 'candidature') => void;

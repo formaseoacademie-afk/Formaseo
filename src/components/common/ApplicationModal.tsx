@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Send, CheckCircle2, ShieldCheck, Sparkles, BookOpen, AlertCircle } from 'lucide-react';
+import { X, Send, CheckCircle2, ShieldCheck, BookOpen, AlertCircle, FileText } from 'lucide-react';
 import { api } from '../../services/api';
 
 interface ApplicationModalProps {
@@ -73,18 +73,49 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
         </button>
 
         {submitted ? (
-          <div className="text-center py-8 space-y-4">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-2">
+          <div className="text-center py-6 sm:py-8 space-y-5 animate-in fade-in">
+            <div className="w-16 h-16 rounded-3xl bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-emerald-600/20">
               <CheckCircle2 className="w-10 h-10" />
             </div>
-            <h3 className="text-2xl font-black text-slate-900">Demande bien reçue !</h3>
-            <p className="text-sm text-slate-600 leading-relaxed max-w-md mx-auto">
-              Merci <strong>{name}</strong>. Un conseiller pédagogique FormaSEO.ma vous transmettra le programme détaillé et les prochaines dates de session sous 24h ouvrées.
-            </p>
-            <div className="pt-4">
+
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
+                Confirmation d'Envoi
+              </span>
+              <h3 className="text-2xl font-black text-slate-900">
+                Demande confirmée avec succès !
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-sm mx-auto">
+                Merci <strong>{name}</strong>. Votre demande a bien été transmise à l'équipe FormaSEO.ma. Vous recevrez les détails complets par email et WhatsApp sous <strong>24h ouvrées</strong>.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left space-y-2 text-xs">
+              <div className="font-bold text-slate-900 text-[11px] uppercase tracking-wide text-slate-500">
+                Prochaines étapes :
+              </div>
+              <div className="flex items-center gap-2 text-slate-700">
+                <span className="w-4 h-4 rounded-full bg-emerald-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0">✓</span>
+                <span>Envoi du programme officiel & calendrier 2026</span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-700">
+                <span className="w-4 h-4 rounded-full bg-emerald-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0">✓</span>
+                <span>Échange d'orientation personnalisé</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-2">
+              <a
+                href="https://wa.me/212600000000?text=Bonjour%20FormaSEO%2C%20je%20viens%20de%20d%C3%A9poser%20ma%20candidature..."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <span>Écrire sur WhatsApp</span>
+              </a>
               <button
                 onClick={handleReset}
-                className="px-6 py-2.5 bg-slate-900 text-white rounded-full text-xs font-bold hover:bg-slate-800"
+                className="w-full sm:w-auto px-6 py-2.5 bg-slate-900 text-white rounded-full text-xs font-bold hover:bg-slate-800 transition-colors"
               >
                 Fermer
               </button>
@@ -94,8 +125,8 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
           <div>
             <div className="mb-6">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-50 text-[#9A6B00] border border-yellow-200/80 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-2">
-                <Sparkles className="w-3.5 h-3.5 text-[#F5B716]" />
-                {intent === 'programme' ? 'Recevoir le syllabus détaillé' : 'Candidature Session Pratique'}
+                <FileText className="w-3.5 h-3.5 text-[#F5B716]" />
+                {intent === 'programme' ? 'Brochure & Syllabus Détaillé' : 'Candidature Session Pratique'}
               </span>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900">
                 {intent === 'programme' ? 'Demander le programme complet' : 'Rejoindre la formation FormaSEO.ma'}

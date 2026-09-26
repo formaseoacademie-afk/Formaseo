@@ -7,16 +7,16 @@ export const fallbackSettings: AcademySettings = {
   addressNote: 'Secteur Avenue Mers Sultan, Casablanca (adresse précise communiquée aux inscrits après confirmation)',
   founderName: 'Wassim Kassy',
   founderRole: 'Fondateur & Consultant SEO',
-  founderStatus: 'Détails biographiques soumis à confirmation avec le fondateur',
+  founderStatus: 'Consultant SEO & Formateur à Casablanca',
   headline: 'Apprenez le SEO en créant un vrai projet digital.',
   subtitle: 'Une formation pratique à Casablanca pour apprendre à créer un site WordPress, développer sa visibilité sur Google et mesurer ses résultats.',
   formatDescription: 'Cursus axé sur la pratique concrète : vous construisez, optimisez et référencez votre propre projet de site web avec un accompagnement étape par étape.',
-  proposedDuration: 'Cursus structuré en 5 semaines intensives (rythme et horaires exacts à valider selon la session)',
-  proposedPriceNote: 'Tarifs et modalités de paiement communiqués sur demande pour la prochaine session',
+  proposedDuration: 'Cursus structuré en 5 semaines intensives (30 à 40h de pratique)',
+  proposedPriceNote: 'Tarifs et modalités de paiement communiqués lors de l’échange avec le conseiller',
   includedItemsNote: [
     'Création et personnalisation d’un site WordPress opérationnel',
     'Méthodologie concrète de recherche de mots-clés et rédaction SEO',
-    'Configuration des outils officiels Google (Search Console, Analytics)',
+    'Configuration des outils officiels Google (Search Console, Analytics GA4)',
     'Optimisation pour la visibilité locale à Casablanca et au Maroc',
     'Accompagnement pratique et revues de projet individuelles'
   ],
@@ -25,25 +25,25 @@ export const fallbackSettings: AcademySettings = {
       title: 'Entrepreneurs & Porteurs de projet',
       subtitle: 'Créer son site et acquérir ses premiers clients',
       description: 'Concevez vous-même votre site vitrine ou boutique et positionnez votre activité sur les recherches de vos futurs clients sans dépendre uniquement du budget publicitaire.',
-      icon: 'Rocket'
+      icon: 'Store'
     },
     {
       title: 'Freelances & Rédacteurs',
       subtitle: 'Monétiser des compétences web à forte valeur',
       description: 'Enrichissez vos prestations avec l’audit SEO, l’optimisation de contenu et la création de sites WordPress pour proposer des offres complètes à vos clients.',
-      icon: 'Briefcase'
+      icon: 'Laptop'
     },
     {
       title: 'Étudiants & En reconversion',
       subtitle: 'Acquérir un savoir-faire digital concret',
       description: 'Sortez des cours théoriques grâce à un projet réel vérifiable à présenter aux recruteurs, démontrant votre maîtrise des outils du référencement naturel.',
-      icon: 'GraduationCap'
+      icon: 'Target'
     },
     {
       title: 'Dirigeants & Responsables Marketing',
       subtitle: 'Piloter et comprendre son acquisition web',
       description: 'Maîtrisez les leviers du Search pour auditer vos prestataires, optimiser le ROI de votre présence digitale et guider vos équipes internes.',
-      icon: 'TrendingUp'
+      icon: 'LineChart'
     }
   ],
   toolsCovered: [
