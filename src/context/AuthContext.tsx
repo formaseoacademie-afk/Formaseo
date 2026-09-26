@@ -4,7 +4,6 @@ import { api } from '../services/api';
 
 interface AuthContextType {
   user: User | null;
-  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
@@ -18,9 +17,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('formaseo_token'));
   const [isLoading, setIsLoading] = useState(true);
 
+  // Validate session against HttpOnly cookie via /api/auth/me
   const refreshUser = async () => {
     try {
       const res = await api.getCurrentUser();
@@ -28,13 +27,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(res.user);
       } else {
         setUser(null);
-        setToken(null);
-        localStorage.removeItem('formaseo_token');
       }
     } catch (e) {
       setUser(null);
-      setToken(null);
-      localStorage.removeItem('formaseo_token');
     } finally {
       setIsLoading(false);
     }
@@ -46,10 +41,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     const res = await api.login(email, password);
-    if (res && res.success && res.data) {
+    if (res && res.success && res.data?.user) {
       setUser(res.data.user);
-      setToken(res.data.token);
-      localStorage.setItem('formaseo_token', res.data.token);
       return { success: true, message: res.message };
     }
     return { success: false, message: res?.message || 'Identifiants invalides' };
@@ -57,10 +50,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (name: string, email: string, password: string, phone?: string) => {
     const res = await api.register(name, email, password, phone);
-    if (res && res.success && res.data) {
+    if (res && res.success && res.data?.user) {
       setUser(res.data.user);
-      setToken(res.data.token);
-      localStorage.setItem('formaseo_token', res.data.token);
       return { success: true, message: res.message };
     }
     return { success: false, message: res?.message || 'Erreur lors de l’inscription' };
@@ -69,8 +60,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     await api.logout();
     setUser(null);
-    setToken(null);
-    localStorage.removeItem('formaseo_token');
   };
 
   const updateProfile = async (data: Partial<User>) => {
@@ -86,7 +75,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         user,
-        token,
         isAuthenticated: !!user,
         isLoading,
         login,

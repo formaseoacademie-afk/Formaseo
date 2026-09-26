@@ -1,1044 +1,769 @@
-import fs from 'fs';
-import path from 'path';
-import bcrypt from 'bcryptjs';
+import pg from 'pg';
+import { Course, Module, Lesson, User, Certificate, LessonProgress, CourseProgressStats, AcademySettings, CurriculumWeek, FaqItem, Enquiry } from '../src/types';
+import { fallbackSettings, fallbackCurriculum, fallbackFaqs } from '../src/config/defaultData';
 
-export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'INSTRUCTOR' | 'STUDENT';
+const { Pool } = pg;
 
-export interface UserEntity {
-  id: string;
-  email: string;
-  passwordHash: string;
-  name: string;
-  role: UserRole;
-  phone?: string;
-  avatarUrl?: string;
-  bio?: string;
-  createdAt: string;
-  updatedAt: string;
+// Connection pool configuration
+const databaseUrl = process.env.DATABASE_URL;
+
+export const pool = databaseUrl
+  ? new Pool({
+      connectionString: databaseUrl,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000,
+    })
+  : null;
+
+if (pool) {
+  pool.on('error', (err) => {
+    console.error('Unexpected error on idle PostgreSQL client', err);
+  });
 }
 
-export interface LessonEntity {
-  id: string;
-  moduleId: string;
-  title: string;
-  summary: string;
-  content: string;
-  videoUrl?: string;
-  durationMinutes: number;
-  position: number;
-  isFreePreview: boolean;
-  resources?: { id: string; title: string; url: string; fileType: string }[];
-}
+// ==========================================
+// SEED & CATALOG DATA DEFINITIONS
+// ==========================================
+const SEED_CATEGORIES = [
+  { id: 'cat-seo', name: 'SEO & Référencement', slug: 'seo', description: 'Techniques de positionnement Google' },
+  { id: 'cat-marketing', name: 'Marketing Digital', slug: 'marketing-digital', description: 'Acquisition digitale multicanale' },
+  { id: 'cat-wordpress', name: 'Création Web & CMS', slug: 'creation-web', description: 'Déploiement de sites WordPress optimisés' },
+];
 
-export interface ModuleEntity {
-  id: string;
-  courseId: string;
-  title: string;
-  description: string;
-  position: number;
-  lessons: LessonEntity[];
-}
-
-export interface CourseEntity {
-  id: string;
-  slug: string;
-  title: string;
-  shortDescription: string;
-  fullDescription: string;
-  categoryId: string;
-  categoryName: string;
-  level: string;
-  durationHours: number;
-  priceMAD: number;
-  priceEUR: number;
-  rating: number;
-  reviewCount: number;
-  studentCount: number;
-  thumbnail: string;
-  instructorId?: string;
-  instructorName: string;
-  instructorRole: string;
-  published: boolean;
-  learningOutcomes: string[];
-  prerequisites: string[];
-  modules: ModuleEntity[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface EnrollmentEntity {
-  id: string;
-  userId: string;
-  courseId: string;
-  status: 'active' | 'completed' | 'suspended' | 'cancelled';
-  enrolledAt: string;
-  completedAt?: string;
-}
-
-export interface LessonProgressEntity {
-  id: string;
-  userId: string;
-  lessonId: string;
-  courseId: string;
-  completed: boolean;
-  progressPercent: number;
-  lastWatchedSeconds: number;
-  completedAt?: string;
-  updatedAt: string;
-}
-
-export interface CertificateEntity {
-  id: string;
-  certificateNumber: string;
-  userId: string;
-  courseId: string;
-  studentName: string;
-  courseTitle: string;
-  issuedAt: string;
-  verificationToken: string;
-  score: number;
-}
-
-export interface PaymentEntity {
-  id: string;
-  userId: string;
-  courseId: string;
-  amount: number;
-  currency: string;
-  provider: string;
-  status: 'pending' | 'paid' | 'failed' | 'refunded' | 'cancelled';
-  transactionRef: string;
-  createdAt: string;
-}
-
-export interface EnquiryEntity {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  profileType: string;
-  goal: string;
-  preferredFormat: string;
-  status: 'new' | 'contacted' | 'enrolled' | 'archived';
-  notes?: string;
-  createdAt: string;
-}
-
-export interface FaqEntity {
-  id: string;
-  question: string;
-  answer: string;
-  category: string;
-  position: number;
-}
-
-export interface CurriculumWeekEntity {
-  weekNumber: number;
-  title: string;
-  hours: string;
-  objective: string;
-  practicalWorkshop: string;
-  topics: string[];
-  tools: string[];
-  status: 'proposé' | 'validé';
-}
-
-export interface DatabaseState {
-  users: UserEntity[];
-  courses: CourseEntity[];
-  enrollments: EnrollmentEntity[];
-  progress: LessonProgressEntity[];
-  certificates: CertificateEntity[];
-  payments: PaymentEntity[];
-  enquiries: EnquiryEntity[];
-  faqs: FaqEntity[];
-  curriculum: CurriculumWeekEntity[];
-  settings: Record<string, any>;
-}
-
-const DB_FILE_PATH = path.join(process.cwd(), 'server', 'data_store_formaseo.json');
-
-export class ProductionDatabase {
-  private data!: DatabaseState;
-
-  constructor() {
-    this.initDatabase();
-  }
-
-  private initDatabase() {
-    try {
-      if (fs.existsSync(DB_FILE_PATH)) {
-        const raw = fs.readFileSync(DB_FILE_PATH, 'utf-8');
-        const parsed = JSON.parse(raw);
-        this.data = this.normalizeState(parsed);
-      } else {
-        this.data = this.createInitialSeed();
-        this.save();
-      }
-    } catch (e) {
-      console.error('Failed to load database file, generating seed.', e);
-      this.data = this.createInitialSeed();
-      this.save();
-    }
-  }
-
-  private normalizeState(raw: any): DatabaseState {
-    const seed = this.createInitialSeed();
-    return {
-      users: Array.isArray(raw.users) && raw.users.length > 0 ? raw.users : seed.users,
-      courses: Array.isArray(raw.courses) && raw.courses.length > 0 ? raw.courses : seed.courses,
-      enrollments: Array.isArray(raw.enrollments) ? raw.enrollments : seed.enrollments,
-      progress: Array.isArray(raw.progress) ? raw.progress : seed.progress,
-      certificates: Array.isArray(raw.certificates) ? raw.certificates : seed.certificates,
-      payments: Array.isArray(raw.payments) ? raw.payments : seed.payments,
-      enquiries: Array.isArray(raw.enquiries) ? raw.enquiries : seed.enquiries,
-      faqs: Array.isArray(raw.faqs) && raw.faqs.length > 0 ? raw.faqs : seed.faqs,
-      curriculum: Array.isArray(raw.curriculum) && raw.curriculum.length > 0 ? raw.curriculum : seed.curriculum,
-      settings: raw.settings || seed.settings,
-    };
-  }
-
-  private createInitialSeed(): DatabaseState {
-    // Bcrypt hashed passwords for seeds:
-    // Admin: FormaSEO@2026!Admin -> hashed
-    // Student: Student@2026!Demo -> hashed
-    const adminHash = bcrypt.hashSync('FormaSEO@2026!Admin', 10);
-    const demoAdminHash = bcrypt.hashSync('admin123', 10);
-    const studentHash = bcrypt.hashSync('Student@2026!Demo', 10);
-
-    const initialUsers: UserEntity[] = [
+const SEED_COURSES: Course[] = [
+  {
+    id: 'course-seo-casablanca',
+    slug: 'formation-seo-casablanca',
+    title: 'Formation SEO & Référencement Google à Casablanca',
+    shortDescription: 'Maîtrisez les algorithmes de Google, le SEO on-page, technique et le netlinking avec des ateliers pratiques sur des cas réels au Maroc.',
+    fullDescription: 'Programme complet de 5 semaines axé sur les leviers concrets du référencement naturel. Vous auditerez des sites en direct, déploierez des stratégies de mots-clés locales et mesurerez le trafic organique avec Google Search Console et GA4.',
+    categoryId: 'cat-seo',
+    categoryName: 'SEO & Référencement',
+    category: 'SEO & Référencement',
+    level: 'Tous niveaux (Débutant à Intermédiaire)',
+    duration: '5 semaines (30h)',
+    durationHours: 30,
+    priceMAD: 4500,
+    priceEUR: 420,
+    originalPriceMAD: 6000,
+    rating: 4.9,
+    reviewCount: 48,
+    studentCount: 120,
+    thumbnail: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?auto=format&fit=crop&w=1200&q=80',
+    instructorId: 'usr-wassim-kassy',
+    instructorName: 'Wassim Kassy',
+    instructorRole: 'Consultant SEO Sénior & Formateur',
+    instructor: {
+      name: 'Wassim Kassy',
+      role: 'Consultant SEO & Formateur à Casablanca',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+      bio: 'Plus de 8 ans d’expérience en référencement naturel et pilotage de stratégies d’acquisition web au Maroc et à l’international.',
+    },
+    published: true,
+    badge: 'Formation Phare',
+    learningOutcomes: [
+      'Maîtriser le fonctionnement des moteurs de recherche et l’indexation Google',
+      'Effectuer une recherche de mots-clés à fort ROI pour le marché marocain',
+      'Optimiser la structure sémantique (Hn, balises, maillage interne)',
+      'Configurer et analyser Google Search Console et Google Analytics GA4',
+      'Construire une stratégie de netlinking éthique et durable',
+    ],
+    prerequisites: ['Utilisation de base d’un ordinateur et d’un navigateur web', 'Aucune connaissance préalable en programmation requise'],
+    modules: [
       {
-        id: 'usr-admin-1',
-        email: 'admin@formaseo.ma',
-        passwordHash: adminHash,
-        name: 'Direction FormaSEO',
-        role: 'SUPER_ADMIN',
-        phone: '+212 6 00 00 00 00',
-        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-        bio: 'Direction Pédagogique et Fondateur de l’Académie FormaSEO.ma',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        id: 'usr-instructor-1',
-        email: 'wassim@formaseo.ma',
-        passwordHash: adminHash,
-        name: 'Wassim Kassy',
-        role: 'INSTRUCTOR',
-        phone: '+212 6 11 22 33 44',
-        avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
-        bio: 'Consultant SEO & Formateur Référencement Naturel à Casablanca',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        id: 'usr-student-1',
-        email: 'etudiant@formaseo.ma',
-        passwordHash: studentHash,
-        name: 'Karim Mansouri',
-        role: 'STUDENT',
-        phone: '+212 6 99 88 77 66',
-        avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
-        bio: 'Étudiant en reconversion Marketing Digital & SEO',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    ];
-
-    const initialCourses: CourseEntity[] = [
-      {
-        id: 'crs-digital-1',
-        slug: 'formation-marketing-digital-casablanca',
-        title: 'Formation Marketing Digital & SEO Casablanca',
-        shortDescription: 'Programme complet de 5 semaines pour créer votre site WordPress professionnel et le positionner sur Google.',
-        fullDescription: 'La formation phare de FormaSEO.ma à Casablanca. Vous apprenez en pratiquant directement sur un projet réel déployé sur votre propre nom de domaine.',
-        categoryId: 'cat-seo',
-        categoryName: 'SEO & Marketing Digital',
-        level: 'Tous niveaux (Débutant à Intermédiaire)',
-        durationHours: 40,
-        priceMAD: 3500,
-        priceEUR: 320,
-        rating: 4.95,
-        reviewCount: 48,
-        studentCount: 142,
-        thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80',
-        instructorId: 'usr-instructor-1',
-        instructorName: 'Wassim Kassy',
-        instructorRole: 'Consultant & Formateur SEO',
-        published: true,
-        learningOutcomes: [
-          'Créer et administrer un site WordPress rapide et sécurisé',
-          'Réaliser une recherche de mots-clés rentable sur le marché marocain',
-          'Rédiger des pages et articles optimisés pour le référencement naturel',
-          'Configurer Google Search Console et Google Analytics GA4',
-          'Dominer les recherches locales sur Google Maps à Casablanca',
-        ],
-        prerequisites: ['Savoir naviguer sur un ordinateur', 'Avoir une idée de projet ou d’activité'],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        modules: [
-          {
-            id: 'mod-1',
-            courseId: 'crs-digital-1',
-            title: 'Semaine 01 : Création de Site WordPress & Infrastructure',
-            description: 'Nom de domaine, hébergement, architecture et mise en ligne complète.',
-            position: 1,
-            lessons: [
-              {
-                id: 'les-1-1',
-                moduleId: 'mod-1',
-                title: 'Introduction & Choix du Nom de Domaine',
-                summary: 'Comprendre le fonctionnement des DNS, serveurs et noms de domaine.',
-                content: 'Dans cette leçon, nous configurons votre nom de domaine et votre hébergement web optimisé pour WordPress.',
-                videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                durationMinutes: 25,
-                position: 1,
-                isFreePreview: true,
-                resources: [
-                  { id: 'res-1', title: 'Checklist Nom de Domaine SEO (PDF)', url: '/ressources-seo', fileType: 'pdf' },
-                ],
-              },
-              {
-                id: 'les-1-2',
-                moduleId: 'mod-1',
-                title: 'Installation Propre de WordPress & Thème Léger',
-                summary: 'Installation pas à pas, configuration des permaliens et choix de thème.',
-                content: 'Guide pratique pour installer WordPress sans surcharge et configurer les options indispensables.',
-                videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                durationMinutes: 35,
-                position: 2,
-                isFreePreview: false,
-              },
-              {
-                id: 'les-1-3',
-                moduleId: 'mod-1',
-                title: 'Création des Pages Stratégiques (Accueil, Services, Contact)',
-                summary: 'Structure des pages clés et ergonomie de conversion.',
-                content: 'Construction visuelle des gabarits essentiels de votre site vitrine ou e-commerce.',
-                videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                durationMinutes: 40,
-                position: 3,
-                isFreePreview: false,
-              },
-            ],
-          },
-          {
-            id: 'mod-2',
-            courseId: 'crs-digital-1',
-            title: 'Semaine 02 : Recherche Mots-Clés & Rédaction SEO',
-            description: 'Intentions de recherche, Google Keyword Planner et cocon sémantique.',
-            position: 2,
-            lessons: [
-              {
-                id: 'les-2-1',
-                moduleId: 'mod-2',
-                title: 'Comprendre les Intentions de Recherche Google',
-                summary: 'Requêtes informationnelles, transactionnelles et navigationnelles.',
-                content: 'Analyse des SERP Google pour identifier ce que Google attend pour chaque requête.',
-                videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                durationMinutes: 30,
-                position: 1,
-                isFreePreview: true,
-              },
-              {
-                id: 'les-2-2',
-                moduleId: 'mod-2',
-                title: 'Cartographie de 50+ Mots-Clés Cibles',
-                summary: 'Utilisation de Google Keyword Planner et AnswerThePublic.',
-                content: 'Extraction des volumes de recherche et construction de la matrice de mots-clés.',
-                videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                durationMinutes: 45,
-                position: 2,
-                isFreePreview: false,
-              },
-              {
-                id: 'les-2-3',
-                moduleId: 'mod-2',
-                title: 'Rédaction d’un Article Optimisé sans Sur-Optimisation',
-                summary: 'Structure Hn, balises Alt, maillage et champ sémantique.',
-                content: 'Méthodologie pas à pas pour rédiger un article captivant qui se positionne durablement.',
-                videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                durationMinutes: 50,
-                position: 3,
-                isFreePreview: false,
-              },
-            ],
-          },
-          {
-            id: 'mod-3',
-            courseId: 'crs-digital-1',
-            title: 'Semaine 03 : Optimisation On-Page & Performance Technique',
-            description: 'Balises SEO, maillage interne, Core Web Vitals et indexation Google.',
-            position: 3,
-            lessons: [
-              {
-                id: 'les-3-1',
-                moduleId: 'mod-3',
-                title: 'Audit Technique & Balisage Title / Meta Description',
-                summary: 'Optimisation chirurgicale des métadonnées pour booster le taux de clic.',
-                content: 'Règles d’or pour des balises Title percutantes et des URL propres.',
-                videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                durationMinutes: 30,
-                position: 1,
-                isFreePreview: false,
-              },
-              {
-                id: 'les-3-2',
-                moduleId: 'mod-3',
-                title: 'Vitesse de Chargement & PageSpeed Insights 90+',
-                summary: 'Compression WebP, mise en cache et Core Web Vitals.',
-                content: 'Optimisation de la vitesse de votre site WordPress pour mobile et desktop.',
-                videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                durationMinutes: 40,
-                position: 2,
-                isFreePreview: false,
-              },
-            ],
-          },
-          {
-            id: 'mod-4',
-            courseId: 'crs-digital-1',
-            title: 'Semaine 04 : SEO Local & Google Maps Casablanca',
-            description: 'Fiche Google Business Profile, avis clients et visibilité géolocalisée.',
-            position: 4,
-            lessons: [
-              {
-                id: 'les-4-1',
-                moduleId: 'mod-4',
-                title: 'Création et Optimisation Google Business Profile',
-                summary: 'Balisage de la fiche Maps, catégories, horaires et photos.',
-                content: 'Comment apparaître dans le pack local de Google sur les requêtes à Casablanca.',
-                videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                durationMinutes: 35,
-                position: 1,
-                isFreePreview: false,
-              },
-            ],
-          },
-          {
-            id: 'mod-5',
-            courseId: 'crs-digital-1',
-            title: 'Semaine 05 : Analytics GA4, Search Console & Projet Final',
-            description: 'Mesure du trafic réel, suivi des positions et validation du certificat.',
-            position: 5,
-            lessons: [
-              {
-                id: 'les-5-1',
-                moduleId: 'mod-5',
-                title: 'Configuration Google Search Console & Suivi de Crawl',
-                summary: 'Soumission du sitemap.xml et analyse des impressions de recherche.',
-                content: 'Interprétation des rapports d’indexation et des performances de recherche.',
-                videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                durationMinutes: 40,
-                position: 1,
-                isFreePreview: false,
-              },
-              {
-                id: 'les-5-2',
-                moduleId: 'mod-5',
-                title: 'Installation Google Analytics 4 & Suivi des Conversions',
-                summary: 'Configuration des événements clés et des objectifs business.',
-                content: 'Mesure précise des visiteurs et du retour sur investissement.',
-                videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                durationMinutes: 45,
-                position: 2,
-                isFreePreview: false,
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: 'crs-seo-2',
-        slug: 'formation-seo-casablanca',
-        title: 'Formation SEO & Référencement Google Casablanca',
-        shortDescription: 'Maîtrisez les techniques avancées du référencement naturel pour dominer la 1ère page de Google.',
-        fullDescription: 'Programme intensif dédié à la stratégie sémantique, à l’audit technique et au netlinking.',
-        categoryId: 'cat-seo',
-        categoryName: 'SEO & Référencement',
-        level: 'Intermédiaire à Avancé',
-        durationHours: 30,
-        priceMAD: 3000,
-        priceEUR: 280,
-        rating: 4.9,
-        reviewCount: 32,
-        studentCount: 95,
-        thumbnail: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=600&q=80',
-        instructorId: 'usr-instructor-1',
-        instructorName: 'Wassim Kassy',
-        instructorRole: 'Consultant SEO',
-        published: true,
-        learningOutcomes: ['Audit SEO technique complet', 'Cocon sémantique et maillage', 'Stratégie de netlinking éthique'],
-        prerequisites: ['Connaissances de base du web'],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        modules: [],
-      },
-      {
-        id: 'crs-wp-3',
-        slug: 'formation-wordpress-casablanca',
-        title: 'Formation WordPress & Création Web Casablanca',
-        shortDescription: 'Apprenez à concevoir des sites web professionnels, responsives et rapides avec WordPress.',
-        fullDescription: 'Ateliers 100% pratiques pour maîtriser WordPress, Gutenberg, WooCommerce et la sécurité web.',
-        categoryId: 'cat-wp',
-        categoryName: 'Création de Sites Web',
-        level: 'Débutant',
-        durationHours: 25,
-        priceMAD: 2800,
-        priceEUR: 260,
-        rating: 4.88,
-        reviewCount: 26,
-        studentCount: 88,
-        thumbnail: 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=600&q=80',
-        instructorId: 'usr-instructor-1',
-        instructorName: 'Wassim Kassy',
-        instructorRole: 'Expert WordPress',
-        published: true,
-        learningOutcomes: ['Concevoir un site WordPress de A à Z', 'Personnaliser le design', 'Sécuriser son site'],
-        prerequisites: ['Aucun prérequis en code'],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        modules: [],
-      },
-    ];
-
-    const initialEnrollments: EnrollmentEntity[] = [
-      {
-        id: 'enr-1',
-        userId: 'usr-student-1',
-        courseId: 'crs-digital-1',
-        status: 'active',
-        enrolledAt: new Date().toISOString(),
-      },
-    ];
-
-    const initialProgress: LessonProgressEntity[] = [
-      {
-        id: 'prg-1',
-        userId: 'usr-student-1',
-        lessonId: 'les-1-1',
-        courseId: 'crs-digital-1',
-        completed: true,
-        progressPercent: 100,
-        lastWatchedSeconds: 1500,
-        completedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        id: 'prg-2',
-        userId: 'usr-student-1',
-        lessonId: 'les-1-2',
-        courseId: 'crs-digital-1',
-        completed: true,
-        progressPercent: 100,
-        lastWatchedSeconds: 2100,
-        completedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    ];
-
-    const initialCertificates: CertificateEntity[] = [
-      {
-        id: 'cert-1',
-        certificateNumber: 'FSA-2026-0042',
-        userId: 'usr-student-1',
-        courseId: 'crs-digital-1',
-        studentName: 'Karim Mansouri',
-        courseTitle: 'Formation Marketing Digital & SEO Casablanca',
-        issuedAt: new Date().toISOString(),
-        verificationToken: 'vtok_' + Math.random().toString(36).substring(2, 12),
-        score: 95,
-      },
-    ];
-
-    const initialPayments: PaymentEntity[] = [
-      {
-        id: 'pay-1',
-        userId: 'usr-student-1',
-        courseId: 'crs-digital-1',
-        amount: 3500,
-        currency: 'MAD',
-        provider: 'CMI_MAROC',
-        status: 'paid',
-        transactionRef: 'TXN-984210',
-        createdAt: new Date().toISOString(),
-      },
-    ];
-
-    const initialEnquiries: EnquiryEntity[] = [
-      {
-        id: 'enq-1',
-        name: 'Youssef El Amrani',
-        email: 'youssef@example.com',
-        phone: '+212 6 61 00 00 00',
-        profileType: 'entrepreneur',
-        goal: 'Lancer un site e-commerce et être visible sur Casablanca',
-        preferredFormat: 'presentiel_casablanca',
-        status: 'new',
-        notes: 'Intéressé par la session du samedi',
-        createdAt: new Date().toISOString(),
-      },
-    ];
-
-    const initialFaqs: FaqEntity[] = [
-      {
-        id: 'faq-1',
-        question: 'En quoi cette formation est-elle différente d’un cours théorique ?',
-        answer: 'La formation FormaSEO.ma repose sur la pratique concrète. Vous travaillez directement sur la conception, l’optimisation et le référencement de votre propre site web ou projet professionnel.',
-        category: 'Pédagogie',
+        id: 'mod-1',
+        courseId: 'course-seo-casablanca',
+        title: 'Fondations du Web & Stratégie de Mots-Clés',
+        description: 'Comprendre l’écosystème Google et cibler les requêtes génératrices de valeur.',
+        durationHours: 6,
         position: 1,
+        lessons: [
+          {
+            id: 'l-1-1',
+            moduleId: 'mod-1',
+            title: 'Comment fonctionne l’algorithme Google en 2026',
+            summary: 'Comprendre le crawl, l’indexation et le classement des pages web.',
+            description: 'Dans cette leçon introductive, nous décortiquons les étapes clés du fonctionnement des moteurs de recherche : robots d’indexation (Googlebot), rendu JavaScript, et critères de pertinence algorithmique.',
+            content: 'Le SEO (Search Engine Optimization) repose sur 3 piliers fondamentaux : la technique, le contenu sémantique, et la popularité (backlinks). Lors de cette session, nous posons les bases pour auditer n’importe quel site web.',
+            videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+            duration: '25 min',
+            durationMinutes: 25,
+            position: 1,
+            isFreePreview: true,
+            type: 'video',
+            resources: [
+              { id: 'r-1', title: 'Guide Officiel Google SEO Starter (PDF)', url: 'https://developers.google.com/search/docs/fundamentals/seo-starter-guide', type: 'pdf', fileSize: '2.4 MB' },
+              { id: 'r-2', title: 'Checklist des 20 critères d’indexation (Cheat Sheet)', url: '#', type: 'pdf', fileSize: '850 KB' },
+            ],
+          },
+          {
+            id: 'l-1-2',
+            moduleId: 'mod-1',
+            title: 'Recherche de Mots-Clés & Intentions de Recherche',
+            summary: 'Trouver les requêtes exactes tapées par vos prospects cibles.',
+            description: 'Apprenez à classifier les intentions (informationnelle, navigationnelle, transactionnelle) et à utiliser Google Keyword Planner, Google Trends et les suggestions automatiques.',
+            content: 'Découvrez la méthodologie pour bâtir une liste de plus de 100 mots-clés pertinents avec volume, difficulté et potentiel commercial.',
+            videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+            duration: '35 min',
+            durationMinutes: 35,
+            position: 2,
+            isFreePreview: false,
+            type: 'video',
+            resources: [
+              { id: 'r-3', title: 'Matrice de Mots-Clés Excel / Google Sheets', url: '#', type: 'xlsx', fileSize: '1.1 MB' },
+            ],
+          },
+        ],
       },
       {
-        id: 'faq-2',
-        question: 'Faut-il savoir coder pour suivre la formation ?',
-        answer: 'Non, aucun prérequis en programmation n’est nécessaire. Nous utilisons WordPress et des outils visuels accessibles pour vous apprendre à bâtir un site professionnel et optimisé de façon autonome.',
-        category: 'Prérequis',
+        id: 'mod-2',
+        courseId: 'course-seo-casablanca',
+        title: 'Optimisation On-Page & Rédaction Sémantique',
+        description: 'Rédiger et structurer du contenu qui se positionne en première page.',
+        durationHours: 6,
         position: 2,
+        lessons: [
+          {
+            id: 'l-2-1',
+            moduleId: 'mod-2',
+            title: 'Balises Titres, Meta Descriptions et Structure Hn',
+            summary: 'Les balises HTML prioritaires pour communiquer avec les moteurs.',
+            description: 'Règles typographiques, longueurs optimales en pixels et intégration naturelle des expressions clés.',
+            content: 'Atelier de rédaction directe sur WordPress avec prévisualisation des snippets Google.',
+            videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+            duration: '30 min',
+            durationMinutes: 30,
+            position: 1,
+            isFreePreview: false,
+            type: 'video',
+            resources: [
+              { id: 'r-4', title: 'Template de balisage On-Page (PDF)', url: '#', type: 'pdf', fileSize: '500 KB' },
+            ],
+          },
+          {
+            id: 'l-2-2',
+            moduleId: 'mod-2',
+            title: 'Maillage Interne & Siloing Thématique',
+            summary: 'Distribuer le jus de lien et guider les robots vers vos pages piliers.',
+            description: 'Structure en silos et cocons sémantiques adaptés aux sites e-commerce et vitrines de services.',
+            content: 'Schématisation d’une architecture de site à fort impact SEO.',
+            videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+            duration: '40 min',
+            durationMinutes: 40,
+            position: 2,
+            isFreePreview: false,
+            type: 'video',
+            resources: [],
+          },
+        ],
       },
       {
-        id: 'faq-3',
-        question: 'La formation a-t-elle lieu en présentiel à Casablanca ou en ligne ?',
-        answer: 'FormaSEO.ma propose des formats adaptés : présentiel à Casablanca (secteur Avenue Mers Sultan) ou sessions en ligne en direct avec accompagnement individuel.',
-        category: 'Format',
+        id: 'mod-3',
+        courseId: 'course-seo-casablanca',
+        title: 'SEO Technique & Signaux Web Essentiels',
+        description: 'Vitesse de chargement, indexabilité, robots.txt et sitemaps XML.',
+        durationHours: 6,
         position: 3,
+        lessons: [
+          {
+            id: 'l-3-1',
+            moduleId: 'mod-3',
+            title: 'Audit Technique avec Google Search Console',
+            summary: 'Détecter les erreurs 404, redirections et problèmes d’exploration.',
+            description: 'Configuration complète de la Search Console par enregistrement DNS et analyse des rapports d’indexation.',
+            content: 'Guide pas à pas pour corriger les pages exclues ou non indexées.',
+            videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+            duration: '45 min',
+            durationMinutes: 45,
+            position: 1,
+            isFreePreview: false,
+            type: 'video',
+            resources: [],
+          },
+        ],
       },
       {
-        id: 'faq-4',
-        question: 'Que vais-je concrètement obtenir à la fin de la formation ?',
-        answer: 'Vous repartez avec un site WordPress fonctionnel en ligne, votre recherche de mots-clés effectuée, vos pages optimisées pour le SEO, votre fiche Google Maps configurée et vos outils de mesure (Search Console, Analytics) connectés.',
-        category: 'Résultats',
+        id: 'mod-4',
+        courseId: 'course-seo-casablanca',
+        title: 'SEO Local à Casablanca & Visibilité Google Maps',
+        description: 'Positionner votre fiche Google Business Profile et capter des clients locaux.',
+        durationHours: 6,
         position: 4,
+        lessons: [
+          {
+            id: 'l-4-1',
+            moduleId: 'mod-4',
+            title: 'Optimisation Complète Google Business Profile',
+            summary: 'Apparaître dans le pack local Google Maps à Casablanca.',
+            description: 'Gestion des catégories, avis clients, photos géolocalisées et signaux de confiance locaux.',
+            content: 'Plan d’action pour dominer les recherches de proximité.',
+            videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+            duration: '35 min',
+            durationMinutes: 35,
+            position: 1,
+            isFreePreview: false,
+            type: 'video',
+            resources: [],
+          },
+        ],
       },
-    ];
+      {
+        id: 'mod-5',
+        courseId: 'course-seo-casablanca',
+        title: 'Mesure de Résultats, GA4 & Certification',
+        description: 'Suivre les conversions, générer des rapports et valider votre certificat.',
+        durationHours: 6,
+        position: 5,
+        lessons: [
+          {
+            id: 'l-5-1',
+            moduleId: 'mod-5',
+            title: 'Tableaux de Bord Google Analytics 4 (GA4)',
+            summary: 'Mesurer le trafic organique réel et les demandes de devis.',
+            description: 'Configuration des événements clés, objectifs de formulaires et rapports personnalisés.',
+            content: 'Création d’un dashboard clair pour vos clients ou votre direction.',
+            videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+            duration: '40 min',
+            durationMinutes: 40,
+            position: 1,
+            isFreePreview: false,
+            type: 'video',
+            resources: [],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'course-marketing-digital',
+    slug: 'formation-marketing-digital-casablanca',
+    title: 'Formation Marketing Digital & Acquisition à Casablanca',
+    shortDescription: 'Programme intensif combinant création de site web WordPress, SEO Google et stratégie d’acquisition digitale.',
+    fullDescription: 'Un cursus transversal pour maîtriser l’ensemble de la chaîne de valeur digitale : de la mise en ligne d’un site vitrine ou e-commerce jusqu’au référencement et à la conversion de prospects en clients.',
+    categoryId: 'cat-marketing',
+    categoryName: 'Marketing Digital',
+    category: 'Marketing Digital',
+    level: 'Tous niveaux',
+    duration: '5 semaines (35h)',
+    durationHours: 35,
+    priceMAD: 4900,
+    priceEUR: 450,
+    originalPriceMAD: 6500,
+    rating: 4.9,
+    reviewCount: 36,
+    studentCount: 95,
+    thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+    instructorId: 'usr-wassim-kassy',
+    instructorName: 'Wassim Kassy',
+    instructorRole: 'Consultant & Formateur',
+    published: true,
+    badge: 'Complet & Pratique',
+    learningOutcomes: [
+      'Créer et déployer un site WordPress complet',
+      'Optimiser le référencement naturel pour Google',
+      'Mettre en place des campagnes d’acquisition digitale',
+      'Mesurer les retours sur investissement avec GA4',
+    ],
+    prerequisites: ['Aucun prérequis technique'],
+    modules: [],
+  },
+  {
+    id: 'course-wordpress-casablanca',
+    slug: 'formation-wordpress-casablanca',
+    title: 'Formation WordPress & Création de Site Web',
+    shortDescription: 'Apprenez à concevoir, sécuriser et administrer un site web professionnel sans coder avec WordPress et Gutenberg.',
+    fullDescription: 'Ateliers pratiques étape par étape : nom de domaine, hébergement, installation, personnalisation visuelle, formulaires de contact et optimisation mobile.',
+    categoryId: 'cat-wordpress',
+    categoryName: 'Création Web & CMS',
+    category: 'Création Web & CMS',
+    level: 'Débutant',
+    duration: '3 semaines (20h)',
+    durationHours: 20,
+    priceMAD: 3500,
+    priceEUR: 320,
+    originalPriceMAD: 4500,
+    rating: 4.8,
+    reviewCount: 29,
+    studentCount: 80,
+    thumbnail: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=80',
+    instructorId: 'usr-wassim-kassy',
+    instructorName: 'Wassim Kassy',
+    instructorRole: 'Consultant & Formateur',
+    published: true,
+    badge: 'Pratique 100%',
+    learningOutcomes: [
+      'Installer et configurer un CMS WordPress professionnel',
+      'Créer des pages d’accueil, services et formulaires modernes',
+      'Optimiser la sécurité et la vitesse de chargement',
+    ],
+    prerequisites: ['Utilisation standard d’un ordinateur'],
+    modules: [],
+  },
+];
 
-    const initialCurriculum: CurriculumWeekEntity[] = [
-      {
-        weekNumber: 1,
-        title: 'Création de Site WordPress & Infrastructure',
-        hours: '8h Pratique',
-        objective: 'Mise en place de l’infrastructure, installation propre de WordPress et déploiement.',
-        practicalWorkshop: 'Votre site web déployé sur votre nom de domaine avec structure saine.',
-        topics: ['Nom de domaine & hébergement', 'Installation de WordPress', 'Architecture des pages clés'],
-        tools: ['WordPress', 'Gutenberg', 'Hébergement Web'],
-        status: 'validé',
-      },
-      {
-        weekNumber: 2,
-        title: 'Recherche Mots-Clés & Rédaction SEO',
-        hours: '8h Pratique',
-        objective: 'Identifier les requêtes rentables et structurer son contenu pour Google.',
-        practicalWorkshop: 'Cartographie de 50+ mots-clés cibles et 1er article publié.',
-        topics: ['Intentions de recherche', 'Google Keyword Planner', 'Rédaction optimisée'],
-        tools: ['Keyword Planner', 'AnswerThePublic', 'IA'],
-        status: 'validé',
-      },
-      {
-        weekNumber: 3,
-        title: 'Optimisation On-Page & Performance Technique',
-        hours: '8h Pratique',
-        objective: 'Optimiser la vitesse, les balises Title, les images et l’indexation.',
-        practicalWorkshop: 'Audit technique et score PageSpeed 90+ sur mobile.',
-        topics: ['Balises Title & Meta', 'Vitesse Core Web Vitals', 'Sitemap XML & Robots.txt'],
-        tools: ['PageSpeed Insights', 'Rank Math', 'Sitemap'],
-        status: 'validé',
-      },
-      {
-        weekNumber: 4,
-        title: 'SEO Local & Google Maps Casablanca',
-        hours: '8h Pratique',
-        objective: 'Capter les requêtes géolocalisées à Casablanca et au Maroc.',
-        practicalWorkshop: 'Fiche Google Business Profile optimisée et avis activés.',
-        topics: ['Google Maps & Pack Local', 'Gestion des avis clients', 'Visuels Canva'],
-        tools: ['Google Business Profile', 'Canva'],
-        status: 'validé',
-      },
-      {
-        weekNumber: 5,
-        title: 'Analytics GA4, Search Console & Projet Final',
-        hours: '8h Pratique',
-        objective: 'Mesurer son trafic réel et valider l’ensemble des livrables.',
-        practicalWorkshop: 'Projet complet certifié : site en production suivi sur Search Console.',
-        topics: ['Google Search Console', 'Google Analytics 4', 'Plan d’action à 3 mois'],
-        tools: ['Search Console', 'GA4', 'Rapports'],
-        status: 'validé',
-      },
-    ];
+// In-Memory state for development / fallback if PostgreSQL pool is not connected
+interface MemoryStore {
+  users: (User & { passwordHash: string })[];
+  courses: Course[];
+  enrollments: { id: string; userId: string; courseId: string; status: string; enrolledAt: string; completedAt?: string }[];
+  lessonProgress: LessonProgress[];
+  certificates: Certificate[];
+  payments: any[];
+  enquiries: Enquiry[];
+  faqs: FaqItem[];
+  curriculum: CurriculumWeek[];
+  settings: AcademySettings;
+  checklist: any[];
+}
 
-    const initialSettings = {
-      academyName: 'FormaSEO.ma',
-      name: 'FormaSEO.ma',
-      domain: 'formaseo.ma',
-      city: 'Casablanca, Maroc',
-      address: 'Secteur Avenue Mers Sultan, Casablanca 20250, Maroc',
-      addressNote: 'Secteur Avenue Mers Sultan, Casablanca',
-      founderName: 'Wassim Kassy',
-      founderRole: 'Fondateur & Consultant SEO',
-      nextSessionDate: 'Session 2026 (Inscriptions Ouvertes)',
-      duration: '5 semaines intensives (Présentiel Casablanca & En Ligne)',
-      email: 'contact@formaseo.ma',
-      phone: '+212 6 00 00 00 00',
-      priceNote: 'Tarifs et facilités de paiement communiqués sur demande pour chaque session.',
-      ownerChecklist: [
-        { id: 'chk-1', label: 'Dates officielles de la session 2026', category: 'Lancement', status: 'confirmé', notes: 'Validé' },
-        { id: 'chk-2', label: 'Tarif officiel et facilités de paiement', category: 'Tarifs', status: 'confirmé', notes: 'Validé' },
-        { id: 'chk-3', label: 'Adresse exacte du centre à Casablanca (Mers Sultan)', category: 'Lancement', status: 'confirmé', notes: 'Validé' },
-        { id: 'chk-4', label: 'Numéro WhatsApp officiel de contact', category: 'Légal', status: 'confirmé', notes: 'Validé' },
-        { id: 'chk-5', label: 'Syllabus complet 5 semaines', category: 'Pédagogie', status: 'confirmé', notes: 'Validé' },
-      ],
-    };
+const memoryStore: MemoryStore = {
+  users: [],
+  courses: JSON.parse(JSON.stringify(SEED_COURSES)),
+  enrollments: [],
+  lessonProgress: [],
+  certificates: [],
+  payments: [],
+  enquiries: [],
+  faqs: JSON.parse(JSON.stringify(fallbackFaqs)),
+  curriculum: JSON.parse(JSON.stringify(fallbackCurriculum)),
+  settings: JSON.parse(JSON.stringify(fallbackSettings)),
+  checklist: JSON.parse(JSON.stringify(fallbackSettings.ownerChecklist || [])),
+};
 
-    return {
-      users: initialUsers,
-      courses: initialCourses,
-      enrollments: initialEnrollments,
-      progress: initialProgress,
-      certificates: initialCertificates,
-      payments: initialPayments,
-      enquiries: initialEnquiries,
-      faqs: initialFaqs,
-      curriculum: initialCurriculum,
-      settings: initialSettings,
-    };
-  }
+// ==========================================
+// DATABASE INTERFACE & POSTGRESQL IMPLEMENTATION
+// ==========================================
+export const db = {
+  async init(): Promise<void> {
+    if (!pool) {
+      console.log('ℹ️ Running in memory database mode (configure DATABASE_URL for PostgreSQL/Supabase)');
+      return;
+    }
 
-  private save() {
     try {
-      const dir = path.dirname(DB_FILE_PATH);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
+      const client = await pool.connect();
+      console.log('✅ Connected to PostgreSQL database');
+      client.release();
+    } catch (err: any) {
+      console.warn('⚠️ PostgreSQL connection warning, using memory persistence fallback:', err.message);
+    }
+  },
+
+  // USERS
+  async getUserByEmail(email: string): Promise<(User & { passwordHash: string }) | null> {
+    const cleanEmail = email.trim().toLowerCase();
+    if (pool) {
+      try {
+        const res = await pool.query('SELECT id, email, password_hash as "passwordHash", name, role, phone, bio, created_at as "createdAt" FROM users WHERE LOWER(email) = $1', [cleanEmail]);
+        if (res.rows.length > 0) return res.rows[0];
+      } catch (err) {
+        console.error('PostgreSQL getUserByEmail error:', err);
       }
-      fs.writeFileSync(DB_FILE_PATH, JSON.stringify(this.data, null, 2), 'utf-8');
-    } catch (err) {
-      console.error('Failed to write to database file', err);
     }
-  }
+    const user = memoryStore.users.find((u) => u.email.toLowerCase() === cleanEmail);
+    return user || null;
+  },
 
-  // --- USERS & AUTH ---
-  findUserByEmail(email: string): UserEntity | undefined {
-    return this.data.users.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
-  }
+  async getUserById(id: string): Promise<User | null> {
+    if (pool) {
+      try {
+        const res = await pool.query('SELECT id, email, name, role, phone, bio, created_at as "createdAt" FROM users WHERE id = $1', [id]);
+        if (res.rows.length > 0) return res.rows[0];
+      } catch (err) {
+        console.error('PostgreSQL getUserById error:', err);
+      }
+    }
+    const u = memoryStore.users.find((x) => x.id === id);
+    if (!u) return null;
+    const { passwordHash, ...safeUser } = u;
+    return safeUser;
+  },
 
-  findUserById(id: string): UserEntity | undefined {
-    return this.data.users.find((u) => u.id === id);
-  }
-
-  createUser(payload: { email: string; password: string; name: string; role?: UserRole; phone?: string }): UserEntity {
-    const passwordHash = bcrypt.hashSync(payload.password, 10);
-    const newUser: UserEntity = {
-      id: 'usr-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
-      email: payload.email.trim().toLowerCase(),
-      passwordHash,
-      name: payload.name.trim(),
-      role: payload.role || 'STUDENT',
-      phone: payload.phone || '',
-      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+  async createUser(userData: { email: string; passwordHash: string; name: string; role?: string; phone?: string; bio?: string }): Promise<User> {
+    const id = `usr-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+    const role = (userData.role || 'STUDENT') as any;
+    const cleanEmail = userData.email.trim().toLowerCase();
+    const newUser = {
+      id,
+      email: cleanEmail,
+      name: userData.name,
+      role,
+      phone: userData.phone,
+      bio: userData.bio,
+      passwordHash: userData.passwordHash,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
     };
-    this.data.users.push(newUser);
-    this.save();
-    return newUser;
-  }
 
-  updateUserProfile(id: string, updates: Partial<Pick<UserEntity, 'name' | 'phone' | 'avatarUrl' | 'bio'>>): UserEntity | null {
-    const user = this.findUserById(id);
-    if (!user) return null;
-    Object.assign(user, updates, { updatedAt: new Date().toISOString() });
-    this.save();
-    return user;
-  }
-
-  updateUserPassword(id: string, newPassword: string): boolean {
-    const user = this.findUserById(id);
-    if (!user) return false;
-    user.passwordHash = bcrypt.hashSync(newPassword, 10);
-    user.updatedAt = new Date().toISOString();
-    this.save();
-    return true;
-  }
-
-  getAllUsers(): UserEntity[] {
-    return this.data.users;
-  }
-
-  // --- COURSES & LMS ---
-  getCourses(): CourseEntity[] {
-    return this.data.courses.filter((c) => c.published);
-  }
-
-  getAllCoursesAdmin(): CourseEntity[] {
-    return this.data.courses;
-  }
-
-  getCourseBySlug(slug: string): CourseEntity | undefined {
-    return this.data.courses.find((c) => c.slug === slug);
-  }
-
-  getCourseById(id: string): CourseEntity | undefined {
-    return this.data.courses.find((c) => c.id === id);
-  }
-
-  updateCourse(id: string, updates: Partial<CourseEntity>): CourseEntity | null {
-    const course = this.getCourseById(id);
-    if (!course) return null;
-    Object.assign(course, updates, { updatedAt: new Date().toISOString() });
-    this.save();
-    return course;
-  }
-
-  // --- ENROLLMENTS & PROGRESS ---
-  getEnrollmentsByUser(userId: string): EnrollmentEntity[] {
-    return this.data.enrollments.filter((e) => e.userId === userId && e.status === 'active');
-  }
-
-  isUserEnrolled(userId: string, courseId: string): boolean {
-    return this.data.enrollments.some((e) => e.userId === userId && e.courseId === courseId && e.status === 'active');
-  }
-
-  enrollUser(userId: string, courseId: string): EnrollmentEntity {
-    const existing = this.data.enrollments.find((e) => e.userId === userId && e.courseId === courseId);
-    if (existing) {
-      existing.status = 'active';
-      this.save();
-      return existing;
+    if (pool) {
+      try {
+        await pool.query(
+          'INSERT INTO users (id, email, password_hash, name, role, phone, bio) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+          [id, cleanEmail, userData.passwordHash, userData.name, role, userData.phone || null, userData.bio || null]
+        );
+      } catch (err) {
+        console.error('PostgreSQL createUser error:', err);
+      }
     }
-    const newEnrollment: EnrollmentEntity = {
-      id: 'enr-' + Date.now(),
+
+    memoryStore.users.push(newUser);
+
+    // Auto-enroll student into flagship SEO course for seamless learning
+    if (role === 'STUDENT') {
+      await this.enrollUser(id, 'course-seo-casablanca');
+    }
+
+    const { passwordHash, ...safeUser } = newUser;
+    return safeUser;
+  },
+
+  async updateUser(id: string, updates: Partial<User>): Promise<User | null> {
+    if (pool) {
+      try {
+        await pool.query(
+          'UPDATE users SET name = COALESCE($1, name), phone = COALESCE($2, phone), bio = COALESCE($3, bio), updated_at = NOW() WHERE id = $4',
+          [updates.name || null, updates.phone || null, updates.bio || null, id]
+        );
+      } catch (err) {
+        console.error('PostgreSQL updateUser error:', err);
+      }
+    }
+
+    const idx = memoryStore.users.findIndex((u) => u.id === id);
+    if (idx !== -1) {
+      memoryStore.users[idx] = { ...memoryStore.users[idx], ...updates };
+      const { passwordHash, ...safe } = memoryStore.users[idx];
+      return safe;
+    }
+    return this.getUserById(id);
+  },
+
+  async updateUserPassword(id: string, newPasswordHash: string): Promise<boolean> {
+    if (pool) {
+      try {
+        await pool.query('UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2', [newPasswordHash, id]);
+      } catch (err) {
+        console.error('PostgreSQL updateUserPassword error:', err);
+      }
+    }
+    const user = memoryStore.users.find((u) => u.id === id);
+    if (user) {
+      user.passwordHash = newPasswordHash;
+      return true;
+    }
+    return true;
+  },
+
+  // COURSES & LMS
+  getCourses(): Course[] {
+    return memoryStore.courses;
+  },
+
+  getCourseBySlug(slug: string): Course | null {
+    return memoryStore.courses.find((c) => c.slug === slug) || null;
+  },
+
+  getCourseById(id: string): Course | null {
+    return memoryStore.courses.find((c) => c.id === id) || null;
+  },
+
+  // ENROLLMENTS
+  async getUserEnrollments(userId: string): Promise<any[]> {
+    if (pool) {
+      try {
+        const res = await pool.query('SELECT * FROM enrollments WHERE user_id = $1', [userId]);
+        return res.rows;
+      } catch (err) {
+        console.error('PostgreSQL getUserEnrollments error:', err);
+      }
+    }
+    return memoryStore.enrollments.filter((e) => e.userId === userId);
+  },
+
+  async isUserEnrolled(userId: string, courseId: string): Promise<boolean> {
+    if (pool) {
+      try {
+        const res = await pool.query('SELECT 1 FROM enrollments WHERE user_id = $1 AND course_id = $2', [userId, courseId]);
+        return res.rows.length > 0;
+      } catch (err) {
+        console.error('PostgreSQL isUserEnrolled error:', err);
+      }
+    }
+    return memoryStore.enrollments.some((e) => e.userId === userId && e.courseId === courseId);
+  },
+
+  async enrollUser(userId: string, courseId: string): Promise<boolean> {
+    const isEnrolled = await this.isUserEnrolled(userId, courseId);
+    if (isEnrolled) return true;
+
+    const enrollment = {
+      id: `enr-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
       userId,
       courseId,
       status: 'active',
       enrolledAt: new Date().toISOString(),
     };
-    this.data.enrollments.push(newEnrollment);
 
-    // Increment course student count
-    const course = this.getCourseById(courseId);
-    if (course) {
-      course.studentCount = (course.studentCount || 0) + 1;
-    }
-
-    this.save();
-    return newEnrollment;
-  }
-
-  getUserProgress(userId: string, courseId?: string): LessonProgressEntity[] {
-    if (courseId) {
-      return this.data.progress.filter((p) => p.userId === userId && p.courseId === courseId);
-    }
-    return this.data.progress.filter((p) => p.userId === userId);
-  }
-
-  updateLessonProgress(userId: string, lessonId: string, courseId: string, completed: boolean, progressPercent: number = 100): LessonProgressEntity {
-    let item = this.data.progress.find((p) => p.userId === userId && p.lessonId === lessonId);
-    if (item) {
-      item.completed = completed;
-      item.progressPercent = progressPercent;
-      item.updatedAt = new Date().toISOString();
-      if (completed && !item.completedAt) {
-        item.completedAt = new Date().toISOString();
+    if (pool) {
+      try {
+        await pool.query(
+          'INSERT INTO enrollments (id, user_id, course_id, status) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
+          [enrollment.id, userId, courseId, 'active']
+        );
+      } catch (err) {
+        console.error('PostgreSQL enrollUser error:', err);
       }
-    } else {
-      item = {
-        id: 'prg-' + Date.now(),
-        userId,
-        lessonId,
-        courseId,
-        completed,
-        progressPercent,
-        lastWatchedSeconds: 0,
-        completedAt: completed ? new Date().toISOString() : undefined,
-        updatedAt: new Date().toISOString(),
-      };
-      this.data.progress.push(item);
     }
-    this.save();
-    return item;
-  }
 
-  calculateCourseCompletion(userId: string, courseId: string): { totalLessons: number; completedLessons: number; percent: number } {
+    memoryStore.enrollments.push(enrollment);
+    return true;
+  },
+
+  // LESSON PROGRESS
+  getUserProgress(userId: string, courseId: string): LessonProgress[] {
+    return memoryStore.lessonProgress.filter((p) => p.userId === userId && p.courseId === courseId);
+  },
+
+  updateLessonProgress(
+    userId: string,
+    lessonId: string,
+    courseId: string,
+    completed: boolean,
+    progressPercent: number = 100
+  ): LessonProgress {
+    const existingIdx = memoryStore.lessonProgress.findIndex(
+      (p) => p.userId === userId && p.lessonId === lessonId
+    );
+
+    const record: LessonProgress = {
+      id: existingIdx !== -1 ? memoryStore.lessonProgress[existingIdx].id : `prg-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      userId,
+      lessonId,
+      courseId,
+      completed,
+      progressPercent,
+      completedAt: completed ? new Date().toISOString() : undefined,
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (existingIdx !== -1) {
+      memoryStore.lessonProgress[existingIdx] = record;
+    } else {
+      memoryStore.lessonProgress.push(record);
+    }
+
+    return record;
+  },
+
+  calculateCourseCompletion(userId: string, courseId: string): CourseProgressStats {
     const course = this.getCourseById(courseId);
-    if (!course) return { totalLessons: 0, completedLessons: 0, percent: 0 };
-    
-    let total = 0;
-    const lessonIds: string[] = [];
-    course.modules.forEach((m) => {
-      m.lessons.forEach((l) => {
-        total++;
-        lessonIds.push(l.id);
-      });
+    if (!course || !course.modules || course.modules.length === 0) {
+      return { totalLessons: 0, completedLessons: 0, percent: 0 };
+    }
+
+    let totalLessons = 0;
+    course.modules.forEach((mod) => {
+      totalLessons += mod.lessons ? mod.lessons.length : 0;
     });
 
-    if (total === 0) return { totalLessons: 0, completedLessons: 0, percent: 0 };
+    if (totalLessons === 0) {
+      return { totalLessons: 0, completedLessons: 0, percent: 100 };
+    }
 
-    const completed = this.data.progress.filter(
-      (p) => p.userId === userId && lessonIds.includes(p.lessonId) && p.completed
-    ).length;
+    const progressList = this.getUserProgress(userId, courseId);
+    const completedCount = progressList.filter((p) => p.completed).length;
+    const percent = Math.min(100, Math.round((completedCount / totalLessons) * 100));
 
     return {
-      totalLessons: total,
-      completedLessons: completed,
-      percent: Math.round((completed / total) * 100),
+      totalLessons,
+      completedLessons: completedCount,
+      percent,
     };
-  }
+  },
 
-  // --- CERTIFICATES ---
-  getCertificatesByUser(userId: string): CertificateEntity[] {
-    return this.data.certificates.filter((c) => c.userId === userId);
-  }
-
-  getCertificateByNumber(certificateNumber: string): CertificateEntity | undefined {
-    return this.data.certificates.find((c) => c.certificateNumber.toLowerCase() === certificateNumber.toLowerCase());
-  }
-
-  issueCertificate(userId: string, courseId: string): CertificateEntity | null {
-    const user = this.findUserById(userId);
-    const course = this.getCourseById(courseId);
-    if (!user || !course) return null;
-
-    const existing = this.data.certificates.find((c) => c.userId === userId && c.courseId === courseId);
+  // CERTIFICATES
+  issueCertificate(userId: string, courseId: string): Certificate {
+    const existing = memoryStore.certificates.find((c) => c.userId === userId && c.courseId === courseId);
     if (existing) return existing;
 
-    const certNumber = 'FSA-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
-    const cert: CertificateEntity = {
-      id: 'cert-' + Date.now(),
-      certificateNumber: certNumber,
+    const user = memoryStore.users.find((u) => u.id === userId);
+    const course = this.getCourseById(courseId);
+
+    const certificateNumber = `FSEO-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+    const verificationToken = `vtok_${Math.random().toString(36).substr(2, 10)}${Math.random().toString(36).substr(2, 10)}`;
+
+    const cert: Certificate = {
+      id: `cert-${Date.now()}`,
+      certificateNumber,
       userId,
       courseId,
-      studentName: user.name,
-      courseTitle: course.title,
+      studentName: user?.name || 'Étudiant FormaSEO',
+      userName: user?.name || 'Étudiant FormaSEO',
+      courseTitle: course?.title || 'Formation Certifiante FormaSEO',
       issuedAt: new Date().toISOString(),
-      verificationToken: 'vtok_' + Math.random().toString(36).substring(2, 12),
+      verificationToken,
       score: 100,
     };
-    this.data.certificates.push(cert);
-    this.save();
+
+    memoryStore.certificates.push(cert);
     return cert;
-  }
+  },
 
-  // --- ENQUIRIES & LEADS ---
-  getEnquiries(): EnquiryEntity[] {
-    return this.data.enquiries;
-  }
+  getCertificateByNumber(certificateNumber: string): Certificate | null {
+    return memoryStore.certificates.find((c) => c.certificateNumber.toUpperCase() === certificateNumber.toUpperCase()) || null;
+  },
 
-  addEnquiry(payload: Omit<EnquiryEntity, 'id' | 'createdAt' | 'status'>): EnquiryEntity {
-    const newEnquiry: EnquiryEntity = {
-      ...payload,
-      id: 'enq-' + Date.now(),
+  getUserCertificates(userId: string): Certificate[] {
+    return memoryStore.certificates.filter((c) => c.userId === userId);
+  },
+
+  // ENQUIRIES & CRM
+  getEnquiries(): Enquiry[] {
+    return memoryStore.enquiries;
+  },
+
+  addEnquiry(data: { name: string; email: string; phone: string; profileType?: string; goal?: string; preferredFormat?: string }): Enquiry {
+    const enquiry: Enquiry = {
+      id: `enq-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      profileType: data.profileType,
+      goal: data.goal,
+      preferredFormat: data.preferredFormat,
       status: 'new',
+      notes: '',
       createdAt: new Date().toISOString(),
     };
-    this.data.enquiries.unshift(newEnquiry);
-    this.save();
-    return newEnquiry;
-  }
+    memoryStore.enquiries.unshift(enquiry);
+    return enquiry;
+  },
 
-  updateEnquiryStatus(id: string, status: 'new' | 'contacted' | 'enrolled' | 'archived', notes?: string): EnquiryEntity | null {
-    const enq = this.data.enquiries.find((e) => e.id === id);
+  updateEnquiryStatus(id: string, status: string, notes?: string): Enquiry | null {
+    const enq = memoryStore.enquiries.find((e) => e.id === id);
     if (!enq) return null;
-    enq.status = status;
+    enq.status = status as any;
     if (notes !== undefined) enq.notes = notes;
-    this.save();
     return enq;
-  }
+  },
 
   deleteEnquiry(id: string): boolean {
-    const initialLen = this.data.enquiries.length;
-    this.data.enquiries = this.data.enquiries.filter((e) => e.id !== id);
-    this.save();
-    return this.data.enquiries.length < initialLen;
-  }
+    const idx = memoryStore.enquiries.findIndex((e) => e.id === id);
+    if (idx === -1) return false;
+    memoryStore.enquiries.splice(idx, 1);
+    return true;
+  },
 
-  // --- FAQS ---
-  getFaqs(): FaqEntity[] {
-    return this.data.faqs;
-  }
+  // SETTINGS & CURRICULUM & FAQS
+  getSettings(): AcademySettings {
+    return memoryStore.settings;
+  },
 
-  addFaq(faq: Omit<FaqEntity, 'id' | 'position'>): FaqEntity {
-    const newFaq: FaqEntity = {
-      ...faq,
-      id: 'faq-' + Date.now(),
-      position: this.data.faqs.length + 1,
+  updateSettings(newSettings: Partial<AcademySettings>): AcademySettings {
+    memoryStore.settings = { ...memoryStore.settings, ...newSettings };
+    return memoryStore.settings;
+  },
+
+  getCurriculum(): CurriculumWeek[] {
+    return memoryStore.curriculum;
+  },
+
+  updateCurriculum(curriculum: CurriculumWeek[]): boolean {
+    memoryStore.curriculum = curriculum;
+    return true;
+  },
+
+  updateCurriculumWeek(weekNumber: number, weekData: Partial<CurriculumWeek>): CurriculumWeek | null {
+    const idx = memoryStore.curriculum.findIndex((w) => w.weekNumber === weekNumber);
+    if (idx === -1) return null;
+    memoryStore.curriculum[idx] = { ...memoryStore.curriculum[idx], ...weekData };
+    return memoryStore.curriculum[idx];
+  },
+
+  getFaqs(): FaqItem[] {
+    return memoryStore.faqs;
+  },
+
+  addFaq(faq: Omit<FaqItem, 'id'>): FaqItem {
+    const newFaq: FaqItem = {
+      id: `faq-${Date.now()}`,
+      question: faq.question,
+      answer: faq.answer,
+      category: faq.category || 'Général',
+      order: memoryStore.faqs.length + 1,
     };
-    this.data.faqs.push(newFaq);
-    this.save();
+    memoryStore.faqs.push(newFaq);
     return newFaq;
-  }
+  },
 
-  updateFaq(id: string, updates: Partial<FaqEntity>): FaqEntity | null {
-    const faq = this.data.faqs.find((f) => f.id === id);
-    if (!faq) return null;
-    Object.assign(faq, updates);
-    this.save();
-    return faq;
-  }
+  updateFaq(id: string, updates: Partial<FaqItem>): boolean {
+    const idx = memoryStore.faqs.findIndex((f) => f.id === id);
+    if (idx === -1) return false;
+    memoryStore.faqs[idx] = { ...memoryStore.faqs[idx], ...updates };
+    return true;
+  },
 
   deleteFaq(id: string): boolean {
-    const initialLen = this.data.faqs.length;
-    this.data.faqs = this.data.faqs.filter((f) => f.id !== id);
-    this.save();
-    return this.data.faqs.length < initialLen;
-  }
+    const idx = memoryStore.faqs.findIndex((f) => f.id === id);
+    if (idx === -1) return false;
+    memoryStore.faqs.splice(idx, 1);
+    return true;
+  },
 
-  // --- CURRICULUM ---
-  getCurriculum(): CurriculumWeekEntity[] {
-    return this.data.curriculum;
-  }
+  // OWNER CHECKLIST
+  getChecklist(): any[] {
+    return memoryStore.checklist;
+  },
 
-  updateCurriculumWeek(weekNumber: number, updates: Partial<CurriculumWeekEntity>): CurriculumWeekEntity | null {
-    const week = this.data.curriculum.find((w) => w.weekNumber === weekNumber);
-    if (!week) return null;
-    Object.assign(week, updates);
-    this.save();
-    return week;
-  }
+  updateChecklistItem(id: string, status: string, notes?: string): any {
+    const item = memoryStore.checklist.find((c) => c.id === id);
+    if (!item) return null;
+    item.status = status;
+    if (notes !== undefined) item.notes = notes;
+    return item;
+  },
 
-  // --- SETTINGS & CHECKLIST ---
-  getSettings(): Record<string, any> {
-    return this.data.settings;
-  }
-
-  updateSettings(updates: Record<string, any>): Record<string, any> {
-    this.data.settings = { ...this.data.settings, ...updates };
-    this.save();
-    return this.data.settings;
-  }
-
-  getChecklist() {
-    return this.data.settings.ownerChecklist || [];
-  }
-
-  addChecklistItem(label: string, category: string = 'Lancement') {
-    if (!this.data.settings.ownerChecklist) this.data.settings.ownerChecklist = [];
+  addChecklistItem(label: string, category: string = 'Lancement'): any {
     const item = {
-      id: 'chk-' + Date.now(),
+      id: `chk-${Date.now()}`,
       label,
-      category,
       status: 'en_attente',
       notes: '',
+      category,
     };
-    this.data.settings.ownerChecklist.push(item);
-    this.save();
+    memoryStore.checklist.push(item);
     return item;
-  }
-
-  updateChecklistItem(id: string, status: string, notes?: string) {
-    if (!this.data.settings.ownerChecklist) return [];
-    const item = this.data.settings.ownerChecklist.find((c: any) => c.id === id);
-    if (item) {
-      item.status = status;
-      if (notes !== undefined) item.notes = notes;
-      this.save();
-    }
-    return this.data.settings.ownerChecklist;
-  }
+  },
 
   deleteChecklistItem(id: string): boolean {
-    if (!this.data.settings.ownerChecklist) return false;
-    const initialLen = this.data.settings.ownerChecklist.length;
-    this.data.settings.ownerChecklist = this.data.settings.ownerChecklist.filter((c: any) => c.id !== id);
-    this.save();
-    return this.data.settings.ownerChecklist.length < initialLen;
-  }
-}
+    const idx = memoryStore.checklist.findIndex((c) => c.id === id);
+    if (idx === -1) return false;
+    memoryStore.checklist.splice(idx, 1);
+    return true;
+  },
 
-export const db = new ProductionDatabase();
+  // PAYMENTS
+  createPayment(paymentData: { transactionRef: string; userId: string; courseId: string; amount: number; currency: string; provider: string; status?: string }): any {
+    const payment = {
+      id: `pay-${Date.now()}`,
+      ...paymentData,
+      status: paymentData.status || 'pending',
+      createdAt: new Date().toISOString(),
+    };
+    memoryStore.payments.push(payment);
+    return payment;
+  },
+
+  getPaymentByRef(transactionRef: string): any | null {
+    return memoryStore.payments.find((p) => p.transactionRef === transactionRef) || null;
+  },
+
+  updatePaymentStatus(transactionRef: string, status: string, rawResponse?: any): any | null {
+    const payment = this.getPaymentByRef(transactionRef);
+    if (!payment) return null;
+    payment.status = status;
+    if (rawResponse) payment.rawResponse = rawResponse;
+    return payment;
+  },
+};

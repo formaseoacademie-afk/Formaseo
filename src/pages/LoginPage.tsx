@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { Lock, Mail, ArrowRight, AlertCircle, ShieldCheck, UserPlus, CheckCircle2 } from 'lucide-react';
+import { Lock, Mail, ArrowRight, AlertCircle, ShieldCheck, UserPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { SEOHead } from '../components/common/SEOHead';
 
@@ -125,19 +125,7 @@ export const LoginPage: React.FC = () => {
           </button>
         </form>
 
-        {/* Quick Demo Credentials Reminder Box */}
-        <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-xs space-y-1.5 text-amber-950">
-          <div className="font-bold flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-amber-900">
-            <CheckCircle2 className="w-3.5 h-3.5 text-amber-700" />
-            Comptes de test disponibles :
-          </div>
-          <div className="text-[11px] text-slate-700 space-y-0.5">
-            <div>• <strong>Admin :</strong> <code>admin@formaseo.ma</code> / <code>FormaSEO@2026!Admin</code></div>
-            <div>• <strong>Étudiant :</strong> <code>etudiant@formaseo.ma</code> / <code>Student@2026!Demo</code></div>
-          </div>
-        </div>
-
-        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-500">
+        <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-500">
           <Link to="/register" className="hover:text-slate-900 transition-colors flex items-center gap-1">
             <UserPlus className="w-3.5 h-3.5 text-[#F5B82E]" />
             <span>Créer un compte étudiant</span>

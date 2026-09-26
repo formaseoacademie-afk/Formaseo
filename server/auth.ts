@@ -1,15 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { db, UserRole, UserEntity } from './database.ts';
+import { db } from './database.ts';
+import { User, UserRole } from '../src/types';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'formaseo_super_secret_jwt_key_2026_change_in_production';
+// Fail fast at startup if JWT_SECRET is missing in production
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  throw new Error('FATAL: JWT_SECRET environment variable is required in production');
+}
+
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_session_jwt_secret_local_testing_only';
 const JWT_EXPIRES_IN = '7d';
 
 export interface AuthRequest extends Request {
-  user?: UserEntity;
+  user?: User;
 }
 
-export const generateToken = (user: UserEntity): string => {
+export const generateToken = (user: User): string => {
   return jwt.sign(
     {
       id: user.id,
@@ -31,25 +37,51 @@ export const verifyToken = (token: string): any => {
 };
 
 export const extractToken = (req: Request): string | null => {
-  // 1. Check Authorization Bearer header
+  // 1. Check HTTP-only Cookie first (primary and most secure mechanism)
+  if (req.cookies && req.cookies.formaseo_session) {
+    return req.cookies.formaseo_session;
+  }
+  if (req.cookies && req.cookies.formaseo_token) {
+    return req.cookies.formaseo_token;
+  }
+  // 2. Check Authorization Bearer header as secondary fallback for external API clients
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     return authHeader.split(' ')[1];
   }
-  // 2. Check Cookie
-  if (req.cookies && req.cookies.formaseo_token) {
-    return req.cookies.formaseo_token;
-  }
   return null;
 };
 
+// CSRF Verification Middleware for state-changing HTTP requests (POST, PUT, PATCH, DELETE)
+export const requireCsrf = (req: Request, res: Response, next: NextFunction) => {
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+    return next();
+  }
+
+  // Exempt webhooks with signature verification
+  if (req.path.includes('/webhook')) {
+    return next();
+  }
+
+  // Verify anti-CSRF custom headers
+  const customHeader = req.headers['x-requested-with'] || req.headers['x-csrf-token'];
+  if (!customHeader) {
+    return res.status(403).json({
+      success: false,
+      message: 'Erreur de sécurité CSRF: En-tête X-Requested-With ou X-CSRF-Token manquant.',
+    });
+  }
+
+  next();
+};
+
 // Middleware: Authenticate User
-export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const requireAuth = async (req: AuthRequest, res: Response, next: NextFunction) => {
   const token = extractToken(req);
   if (!token) {
     return res.status(401).json({
       success: false,
-      message: 'Authentification requise. Veuillez vous connecter pour accéder à cette ressource.',
+      message: 'Authentification requise. Veuillez vous connecter.',
     });
   }
 
@@ -61,16 +93,20 @@ export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction)
     });
   }
 
-  const user = db.findUserById(decoded.id);
-  if (!user) {
-    return res.status(401).json({
-      success: false,
-      message: 'Utilisateur introuvable.',
-    });
-  }
+  try {
+    const user = await db.getUserById(decoded.id);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Utilisateur introuvable.',
+      });
+    }
 
-  req.user = user;
-  next();
+    req.user = user;
+    next();
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Erreur d’authentification serveur' });
+  }
 };
 
 // Middleware: Require specific RBAC Roles
@@ -91,15 +127,19 @@ export const requireRole = (allowedRoles: UserRole[]) => {
   };
 };
 
-// Middleware: Optional auth (attaches user if present, but doesn't block)
-export const optionalAuth = (req: AuthRequest, res: Response, next: NextFunction) => {
+// Middleware: Optional auth (attaches user if valid session cookie present)
+export const optionalAuth = async (req: AuthRequest, res: Response, next: NextFunction) => {
   const token = extractToken(req);
   if (token) {
     const decoded = verifyToken(token);
     if (decoded && decoded.id) {
-      const user = db.findUserById(decoded.id);
-      if (user) {
-        req.user = user;
+      try {
+        const user = await db.getUserById(decoded.id);
+        if (user) {
+          req.user = user;
+        }
+      } catch (err) {
+        // ignore optional lookup errors
       }
     }
   }

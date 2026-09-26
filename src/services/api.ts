@@ -16,24 +16,25 @@ import { fallbackSettings, fallbackCurriculum, fallbackFaqs } from '../config/de
 
 const API_BASE = '/api';
 
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('formaseo_token');
+const getRequestHeaders = (customHeaders: Record<string, string> = {}) => {
   return {
     'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    'X-Requested-With': 'XMLHttpRequest',
+    ...customHeaders,
   };
 };
 
 export const api = {
   // ==========================================
-  // AUTHENTICATION
+  // AUTHENTICATION (PURE HTTP-ONLY COOKIES)
   // ==========================================
   auth: {
-    async login(email: string, password: string): Promise<{ success: boolean; data?: { user: User; token: string }; message?: string } | null> {
+    async login(email: string, password: string): Promise<{ success: boolean; data?: { user: User }; message?: string } | null> {
       try {
         const res = await fetch(`${API_BASE}/auth/login`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getRequestHeaders(),
+          credentials: 'include',
           body: JSON.stringify({ email, password }),
         });
         const data = await res.json();
@@ -43,11 +44,12 @@ export const api = {
       }
     },
 
-    async register(userData: { name: string; email: string; password: string; phone?: string }): Promise<{ success: boolean; data?: { user: User; token: string }; message?: string } | null> {
+    async register(userData: { name: string; email: string; password: string; phone?: string }): Promise<{ success: boolean; data?: { user: User }; message?: string } | null> {
       try {
         const res = await fetch(`${API_BASE}/auth/register`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getRequestHeaders(),
+          credentials: 'include',
           body: JSON.stringify(userData),
         });
         const data = await res.json();
@@ -59,7 +61,11 @@ export const api = {
 
     async logout(): Promise<void> {
       try {
-        await fetch(`${API_BASE}/auth/logout`, { method: 'POST', headers: getAuthHeaders() });
+        await fetch(`${API_BASE}/auth/logout`, {
+          method: 'POST',
+          headers: getRequestHeaders(),
+          credentials: 'include',
+        });
       } catch (e) {
         // ignore
       }
@@ -67,7 +73,10 @@ export const api = {
 
     async getCurrentUser(): Promise<{ user: User; enrollments: any[]; certificatesCount: number } | null> {
       try {
-        const res = await fetch(`${API_BASE}/auth/me`, { headers: getAuthHeaders() });
+        const res = await fetch(`${API_BASE}/auth/me`, {
+          headers: getRequestHeaders(),
+          credentials: 'include',
+        });
         if (!res.ok) return null;
         const data = await res.json();
         return data.data;
@@ -80,7 +89,8 @@ export const api = {
       try {
         const res = await fetch(`${API_BASE}/auth/profile`, {
           method: 'PUT',
-          headers: getAuthHeaders(),
+          headers: getRequestHeaders(),
+          credentials: 'include',
           body: JSON.stringify(updates),
         });
         const data = await res.json();
@@ -94,7 +104,8 @@ export const api = {
       try {
         const res = await fetch(`${API_BASE}/auth/password`, {
           method: 'PUT',
-          headers: getAuthHeaders(),
+          headers: getRequestHeaders(),
+          credentials: 'include',
           body: JSON.stringify(params),
         });
         return await res.json();
@@ -127,7 +138,7 @@ export const api = {
   courses: {
     async getAll(): Promise<Course[]> {
       try {
-        const res = await fetch(`${API_BASE}/courses`);
+        const res = await fetch(`${API_BASE}/courses`, { credentials: 'include' });
         if (!res.ok) throw new Error('API Error');
         const data = await res.json();
         return data.data || [];
@@ -138,7 +149,10 @@ export const api = {
 
     async getBySlug(slug: string): Promise<Course | null> {
       try {
-        const res = await fetch(`${API_BASE}/courses/${slug}`, { headers: getAuthHeaders() });
+        const res = await fetch(`${API_BASE}/courses/${slug}`, {
+          headers: getRequestHeaders(),
+          credentials: 'include',
+        });
         if (!res.ok) return null;
         const data = await res.json();
         return data.data;
@@ -165,11 +179,14 @@ export const api = {
       certificates: Certificate[];
     }> {
       try {
-        const res = await fetch(`${API_BASE}/student/dashboard`, { headers: getAuthHeaders() });
+        const res = await fetch(`${API_BASE}/student/dashboard`, {
+          headers: getRequestHeaders(),
+          credentials: 'include',
+        });
         if (!res.ok) return { enrollments: [], courses: [], certificates: [] };
         const data = await res.json();
         const payload = data.data || {};
-        
+
         const enrollments = (payload.enrolledCourses || []).map((item: any) => ({
           ...item.enrollment,
           course: item.course,
@@ -189,7 +206,8 @@ export const api = {
     async getProgress(courseId: string): Promise<LessonProgress[]> {
       try {
         const res = await fetch(`${API_BASE}/student/courses/${courseId}/progress`, {
-          headers: getAuthHeaders(),
+          headers: getRequestHeaders(),
+          credentials: 'include',
         });
         if (!res.ok) return [];
         const data = await res.json();
@@ -208,7 +226,8 @@ export const api = {
       try {
         const res = await fetch(`${API_BASE}/student/progress`, {
           method: 'POST',
-          headers: getAuthHeaders(),
+          headers: getRequestHeaders(),
+          credentials: 'include',
           body: JSON.stringify(params),
         });
         return await res.json();
@@ -219,7 +238,10 @@ export const api = {
 
     async getCertificates(): Promise<Certificate[]> {
       try {
-        const res = await fetch(`${API_BASE}/student/certificates`, { headers: getAuthHeaders() });
+        const res = await fetch(`${API_BASE}/student/certificates`, {
+          headers: getRequestHeaders(),
+          credentials: 'include',
+        });
         if (!res.ok) return [];
         const data = await res.json();
         return data.data || [];
@@ -253,7 +275,8 @@ export const api = {
       try {
         const res = await fetch(`${API_BASE}/checkout/create`, {
           method: 'POST',
-          headers: getAuthHeaders(),
+          headers: getRequestHeaders(),
+          credentials: 'include',
           body: JSON.stringify({ courseId }),
         });
         return await res.json();
@@ -266,7 +289,8 @@ export const api = {
       try {
         const res = await fetch(`${API_BASE}/checkout/verify`, {
           method: 'POST',
-          headers: getAuthHeaders(),
+          headers: getRequestHeaders(),
+          credentials: 'include',
           body: JSON.stringify({ transactionRef }),
         });
         return await res.json();
@@ -282,7 +306,7 @@ export const api = {
   settings: {
     async get(): Promise<AcademySettings> {
       try {
-        const res = await fetch(`${API_BASE}/settings`);
+        const res = await fetch(`${API_BASE}/settings`, { credentials: 'include' });
         if (!res.ok) throw new Error('API Error');
         const data = await res.json();
         return data.data || fallbackSettings;
@@ -295,7 +319,8 @@ export const api = {
       try {
         const res = await fetch(`${API_BASE}/settings`, {
           method: 'PUT',
-          headers: getAuthHeaders(),
+          headers: getRequestHeaders(),
+          credentials: 'include',
           body: JSON.stringify(settings),
         });
         const data = await res.json();
@@ -315,7 +340,7 @@ export const api = {
 
   async getChecklist(): Promise<any[]> {
     try {
-      const res = await fetch(`${API_BASE}/checklist`);
+      const res = await fetch(`${API_BASE}/checklist`, { credentials: 'include' });
       if (!res.ok) throw new Error('API Error');
       const data = await res.json();
       return data.data || [];
@@ -327,8 +352,9 @@ export const api = {
   async updateChecklist(id: string, status: string): Promise<boolean> {
     try {
       await fetch(`${API_BASE}/checklist/${id}`, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
+        method: 'PATCH',
+        headers: getRequestHeaders(),
+        credentials: 'include',
         body: JSON.stringify({ status }),
       });
       return true;
@@ -341,7 +367,8 @@ export const api = {
     try {
       const res = await fetch(`${API_BASE}/checklist`, {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers: getRequestHeaders(),
+        credentials: 'include',
         body: JSON.stringify({ label, category }),
       });
       const data = await res.json();
@@ -355,7 +382,8 @@ export const api = {
     try {
       await fetch(`${API_BASE}/checklist/${id}`, {
         method: 'DELETE',
-        headers: getAuthHeaders(),
+        headers: getRequestHeaders(),
+        credentials: 'include',
       });
       return true;
     } catch (e) {
@@ -369,7 +397,7 @@ export const api = {
   curriculum: {
     async get(): Promise<CurriculumWeek[]> {
       try {
-        const res = await fetch(`${API_BASE}/curriculum`);
+        const res = await fetch(`${API_BASE}/curriculum`, { credentials: 'include' });
         if (!res.ok) throw new Error('API Error');
         const data = await res.json();
         return data.data || fallbackCurriculum;
@@ -382,7 +410,8 @@ export const api = {
       try {
         await fetch(`${API_BASE}/curriculum`, {
           method: 'PUT',
-          headers: getAuthHeaders(),
+          headers: getRequestHeaders(),
+          credentials: 'include',
           body: JSON.stringify(curriculum),
         });
         return true;
@@ -395,7 +424,8 @@ export const api = {
       try {
         await fetch(`${API_BASE}/curriculum/${weekNumber}`, {
           method: 'PUT',
-          headers: getAuthHeaders(),
+          headers: getRequestHeaders(),
+          credentials: 'include',
           body: JSON.stringify(weekData),
         });
         return true;
@@ -421,7 +451,7 @@ export const api = {
   faqs: {
     async get(): Promise<FaqItem[]> {
       try {
-        const res = await fetch(`${API_BASE}/faqs`);
+        const res = await fetch(`${API_BASE}/faqs`, { credentials: 'include' });
         if (!res.ok) throw new Error('API Error');
         const data = await res.json();
         return data.data || fallbackFaqs;
@@ -434,7 +464,8 @@ export const api = {
       try {
         const res = await fetch(`${API_BASE}/faqs`, {
           method: 'POST',
-          headers: getAuthHeaders(),
+          headers: getRequestHeaders(),
+          credentials: 'include',
           body: JSON.stringify(faq),
         });
         const data = await res.json();
@@ -448,7 +479,8 @@ export const api = {
       try {
         await fetch(`${API_BASE}/faqs/${id}`, {
           method: 'PUT',
-          headers: getAuthHeaders(),
+          headers: getRequestHeaders(),
+          credentials: 'include',
           body: JSON.stringify(faq),
         });
         return true;
@@ -461,7 +493,8 @@ export const api = {
       try {
         await fetch(`${API_BASE}/faqs/${id}`, {
           method: 'DELETE',
-          headers: getAuthHeaders(),
+          headers: getRequestHeaders(),
+          credentials: 'include',
         });
         return true;
       } catch (e) {
@@ -507,7 +540,8 @@ export const api = {
         };
         const res = await fetch(`${API_BASE}/enquiries`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getRequestHeaders(),
+          credentials: 'include',
           body: JSON.stringify(payload),
         });
         return await res.json();
@@ -518,7 +552,10 @@ export const api = {
 
     async getAll(): Promise<Enquiry[]> {
       try {
-        const res = await fetch(`${API_BASE}/enquiries`, { headers: getAuthHeaders() });
+        const res = await fetch(`${API_BASE}/enquiries`, {
+          headers: getRequestHeaders(),
+          credentials: 'include',
+        });
         if (!res.ok) throw new Error('API Error');
         const data = await res.json();
         return data.data || [];
@@ -530,8 +567,9 @@ export const api = {
     async updateStatus(id: string, status: string, notes?: string): Promise<boolean> {
       try {
         await fetch(`${API_BASE}/enquiries/${id}`, {
-          method: 'PUT',
-          headers: getAuthHeaders(),
+          method: 'PATCH',
+          headers: getRequestHeaders(),
+          credentials: 'include',
           body: JSON.stringify({ status, notes }),
         });
         return true;
@@ -544,7 +582,8 @@ export const api = {
       try {
         await fetch(`${API_BASE}/enquiries/${id}`, {
           method: 'DELETE',
-          headers: getAuthHeaders(),
+          headers: getRequestHeaders(),
+          credentials: 'include',
         });
         return true;
       } catch (e) {
