@@ -125,7 +125,65 @@ export const LoginPage: React.FC = () => {
           </button>
         </form>
 
-        <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-500">
+        {/* Quick Demo Credentials & One-Click Login */}
+        <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs space-y-3">
+          <div className="font-bold flex items-center justify-between text-[11px] text-amber-900 uppercase tracking-wider">
+            <span>Comptes de test & démo</span>
+            <span className="text-[10px] font-normal text-amber-700">1-clic pour tester</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={async () => {
+                setEmail('admin@formaseo.ma');
+                setPassword('DevAdminPass123!');
+                setLoading(true);
+                setErrorMsg('');
+                const res = await login('admin@formaseo.ma', 'DevAdminPass123!');
+                setLoading(false);
+                if (res.success) {
+                  navigate('/admin', { replace: true });
+                } else {
+                  setErrorMsg(res.message || 'Erreur connexion');
+                }
+              }}
+              className="px-3 py-2.5 bg-white hover:bg-amber-100/60 border border-amber-200 rounded-xl text-left transition-all shadow-sm group cursor-pointer"
+            >
+              <div className="font-black text-[#082238] text-xs flex items-center justify-between">
+                <span>Super Admin</span>
+                <ArrowRight className="w-3 h-3 text-[#F5B82E] group-hover:translate-x-0.5 transition-transform" />
+              </div>
+              <div className="text-[10px] text-slate-500 font-mono truncate mt-0.5">admin@formaseo.ma</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={async () => {
+                setEmail('etudiant@formaseo.ma');
+                setPassword('DevStudentPass123!');
+                setLoading(true);
+                setErrorMsg('');
+                const res = await login('etudiant@formaseo.ma', 'DevStudentPass123!');
+                setLoading(false);
+                if (res.success) {
+                  navigate('/student/dashboard', { replace: true });
+                } else {
+                  setErrorMsg(res.message || 'Erreur connexion');
+                }
+              }}
+              className="px-3 py-2.5 bg-white hover:bg-amber-100/60 border border-amber-200 rounded-xl text-left transition-all shadow-sm group cursor-pointer"
+            >
+              <div className="font-black text-[#082238] text-xs flex items-center justify-between">
+                <span>Étudiant</span>
+                <ArrowRight className="w-3 h-3 text-[#F5B82E] group-hover:translate-x-0.5 transition-transform" />
+              </div>
+              <div className="text-[10px] text-slate-500 font-mono truncate mt-0.5">etudiant@formaseo.ma</div>
+            </button>
+          </div>
+        </div>
+
+        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-500">
           <Link to="/register" className="hover:text-slate-900 transition-colors flex items-center gap-1">
             <UserPlus className="w-3.5 h-3.5 text-[#F5B82E]" />
             <span>Créer un compte étudiant</span>

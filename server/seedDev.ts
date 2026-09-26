@@ -26,6 +26,9 @@ export async function seedDevelopmentData(): Promise<void> {
       bio: 'Administrateur de l’Académie FormaSEO Casablanca.',
     });
     console.log('✅ Created local dev Super Admin account (admin@formaseo.ma)');
+  } else {
+    await db.updateUserPassword(existingAdmin.id, adminHash);
+    console.log('✅ Updated password for Super Admin account (admin@formaseo.ma)');
   }
 
   const existingStudent = await db.getUserByEmail('etudiant@formaseo.ma');
@@ -42,6 +45,9 @@ export async function seedDevelopmentData(): Promise<void> {
     // Create a demo certificate for development inspection
     db.issueCertificate(student.id, 'course-seo-casablanca');
     console.log('✅ Created local dev Student account (etudiant@formaseo.ma)');
+  } else {
+    await db.updateUserPassword(existingStudent.id, studentHash);
+    console.log('✅ Updated password for Student account (etudiant@formaseo.ma)');
   }
 
   console.log('✨ Development seeding completed.');
