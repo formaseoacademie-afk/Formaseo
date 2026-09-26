@@ -8,10 +8,14 @@ export default {
     extend: {
       colors: {
         brand: {
+          primary: '#082238',
+          'primary-light': '#0B2C47',
+          primaryLight: '#0B2C47',
           dark: '#082238',
           navy: '#0B2C47',
           darker: '#041624',
           accent: '#F5B716',
+          'accent-hover': '#E0A30B',
           accentHover: '#E0A30B',
           accentLight: '#FFF8E6',
           yellow: '#F5B716',

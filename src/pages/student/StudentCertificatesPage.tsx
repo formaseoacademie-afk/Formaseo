@@ -35,7 +35,7 @@ export const StudentCertificatesPage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-brand-primary border-t-brand-accent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-[#082238] border-t-[#F5B82E] rounded-full animate-spin" />
       </div>
     );
   }
@@ -43,17 +43,17 @@ export const StudentCertificatesPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 pb-16">
       {/* Top Header */}
-      <div className="bg-brand-primary text-white py-10 px-4 sm:px-6 lg:px-8 border-b border-white/10">
+      <div className="bg-[#082238] text-white py-10 px-4 sm:px-6 lg:px-8 border-b border-white/10">
         <div className="max-w-6xl mx-auto">
           <Link
             to="/student/dashboard"
-            className="inline-flex items-center gap-2 text-slate-300 hover:text-brand-accent text-sm font-semibold mb-4 transition-colors"
+            className="inline-flex items-center gap-2 text-slate-300 hover:text-[#F5B82E] text-sm font-semibold mb-4 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Tableau de bord</span>
           </Link>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-brand-accent/20 flex items-center justify-center text-brand-accent border border-brand-accent/30">
+            <div className="w-12 h-12 rounded-2xl bg-[#F5B82E]/20 flex items-center justify-center text-[#F5B82E] border border-[#F5B82E]/30">
               <Award className="w-7 h-7" />
             </div>
             <div>
@@ -72,7 +72,7 @@ export const StudentCertificatesPage: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
         {certificates.length === 0 ? (
           <div className="bg-white rounded-2xl p-12 text-center border border-slate-200 shadow-sm max-w-xl mx-auto">
-            <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-brand-accent mx-auto mb-4 border border-amber-100">
+            <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-[#F5B82E] mx-auto mb-4 border border-amber-100">
               <Award className="w-8 h-8" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">Aucun certificat délivré pour l'instant</h3>
@@ -81,7 +81,7 @@ export const StudentCertificatesPage: React.FC = () => {
             </p>
             <Link
               to="/student/dashboard"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-primary text-white font-bold text-sm rounded-xl hover:bg-brand-primary-light transition-all shadow-md"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#082238] text-white font-bold text-sm rounded-xl hover:bg-[#0B2C47] transition-all shadow-md"
             >
               <span>Continuer mes cours</span>
             </Link>
@@ -95,7 +95,7 @@ export const StudentCertificatesPage: React.FC = () => {
               >
                 {/* Decorative background watermark */}
                 <div className="absolute top-0 right-0 transform translate-x-8 -translate-y-8 opacity-5 pointer-events-none">
-                  <Award className="w-48 h-48 text-brand-primary" />
+                  <Award className="w-48 h-48 text-[#082238]" />
                 </div>
 
                 <div>
@@ -109,11 +109,11 @@ export const StudentCertificatesPage: React.FC = () => {
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-black text-brand-primary">
+                  <h3 className="text-xl font-black text-[#082238]">
                     {cert.courseTitle}
                   </h3>
                   <p className="text-xs text-slate-600 mt-1">
-                    Délivré à <strong className="text-slate-800">{cert.userName}</strong>
+                    Délivré à <strong className="text-slate-800">{cert.userName || cert.studentName}</strong>
                   </p>
 
                   <div className="flex items-center gap-2 mt-4 text-xs text-slate-500 font-medium">
@@ -126,9 +126,9 @@ export const StudentCertificatesPage: React.FC = () => {
                   <Link
                     to={`/certificates/${cert.certificateNumber}`}
                     target="_blank"
-                    className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-primary hover:bg-brand-primary-light text-white text-xs font-bold rounded-xl transition-colors shadow-sm"
+                    className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 bg-[#082238] hover:bg-[#0B2C47] text-white text-xs font-bold rounded-xl transition-colors shadow-sm"
                   >
-                    <ExternalLink className="w-3.5 h-3.5 text-brand-accent" />
+                    <ExternalLink className="w-3.5 h-3.5 text-[#F5B82E]" />
                     <span>Page de vérification</span>
                   </Link>
 

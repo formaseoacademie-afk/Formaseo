@@ -73,17 +73,17 @@ export const StudentProfilePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
       {/* Top Banner */}
-      <div className="bg-brand-primary text-white py-10 px-4 sm:px-6 lg:px-8 border-b border-white/10">
+      <div className="bg-[#082238] text-white py-10 px-4 sm:px-6 lg:px-8 border-b border-white/10">
         <div className="max-w-4xl mx-auto">
           <Link
             to="/student/dashboard"
-            className="inline-flex items-center gap-2 text-slate-300 hover:text-brand-accent text-sm font-semibold mb-4 transition-colors"
+            className="inline-flex items-center gap-2 text-slate-300 hover:text-[#F5B82E] text-sm font-semibold mb-4 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Tableau de bord</span>
           </Link>
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-accent to-amber-300 text-brand-primary font-black text-2xl flex items-center justify-center shadow-lg shadow-brand-accent/20">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#F5B82E] to-amber-300 text-[#082238] font-black text-2xl flex items-center justify-center shadow-lg">
               {user?.name?.charAt(0).toUpperCase() || 'U'}
             </div>
             <div>
@@ -91,7 +91,7 @@ export const StudentProfilePage: React.FC = () => {
                 Paramètres du compte
               </h1>
               <p className="text-slate-300 text-xs sm:text-sm mt-0.5">
-                {user?.email} • Rôle : <span className="text-brand-accent font-bold">{user?.role}</span>
+                {user?.email} • Rôle : <span className="text-[#F5B82E] font-bold">{user?.role}</span>
               </p>
             </div>
           </div>
@@ -116,8 +116,8 @@ export const StudentProfilePage: React.FC = () => {
 
           {/* Personal Information */}
           <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
-            <h2 className="text-lg font-black text-brand-primary mb-6 flex items-center gap-2">
-              <User className="w-5 h-5 text-brand-accent" />
+            <h2 className="text-lg font-black text-[#082238] mb-6 flex items-center gap-2">
+              <User className="w-5 h-5 text-[#F5B82E]" />
               <span>Informations personnelles</span>
             </h2>
 
@@ -135,7 +135,7 @@ export const StudentProfilePage: React.FC = () => {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-2.5 sm:text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-accent focus:border-brand-primary outline-none transition-all"
+                    className="block w-full pl-10 pr-3 py-2.5 sm:text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#F5B82E] focus:border-[#082238] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -170,7 +170,7 @@ export const StudentProfilePage: React.FC = () => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+212 6XX-XXXXXX"
-                    className="block w-full pl-10 pr-3 py-2.5 sm:text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-accent focus:border-brand-primary outline-none transition-all"
+                    className="block w-full pl-10 pr-3 py-2.5 sm:text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#F5B82E] focus:border-[#082238] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -184,7 +184,7 @@ export const StudentProfilePage: React.FC = () => {
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   placeholder="Présentez brièvement vos projets SEO ou marketing digital..."
-                  className="block w-full px-3 py-2.5 sm:text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-accent focus:border-brand-primary outline-none transition-all"
+                  className="block w-full px-3 py-2.5 sm:text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#F5B82E] focus:border-[#082238] outline-none transition-all"
                 />
               </div>
             </div>
@@ -192,8 +192,8 @@ export const StudentProfilePage: React.FC = () => {
 
           {/* Password Security */}
           <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
-            <h2 className="text-lg font-black text-brand-primary mb-6 flex items-center gap-2">
-              <Lock className="w-5 h-5 text-brand-accent" />
+            <h2 className="text-lg font-black text-[#082238] mb-6 flex items-center gap-2">
+              <Lock className="w-5 h-5 text-[#F5B82E]" />
               <span>Sécurité & Mot de passe</span>
             </h2>
 
@@ -207,7 +207,7 @@ export const StudentProfilePage: React.FC = () => {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Minimum 6 caractères"
-                  className="block w-full px-3 py-2.5 sm:text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-accent focus:border-brand-primary outline-none transition-all"
+                  className="block w-full px-3 py-2.5 sm:text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#F5B82E] focus:border-[#082238] outline-none transition-all"
                 />
               </div>
 
@@ -221,7 +221,7 @@ export const StudentProfilePage: React.FC = () => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Répétez le nouveau mot de passe"
-                    className="block w-full px-3 py-2.5 sm:text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-accent focus:border-brand-primary outline-none transition-all"
+                    className="block w-full px-3 py-2.5 sm:text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#F5B82E] focus:border-[#082238] outline-none transition-all"
                   />
                 </div>
               )}
@@ -233,13 +233,13 @@ export const StudentProfilePage: React.FC = () => {
             <button
               type="submit"
               disabled={saving}
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-brand-primary hover:bg-brand-primary-light text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-brand-primary/20 disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#082238] hover:bg-[#0B2C47] text-white font-bold text-sm rounded-xl transition-all shadow-lg disabled:opacity-50"
             >
               {saving ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <Save className="w-4 h-4 text-brand-accent" />
+                  <Save className="w-4 h-4 text-[#F5B82E]" />
                   <span>Enregistrer les modifications</span>
                 </>
               )}

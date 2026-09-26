@@ -50,7 +50,7 @@ export const StudentCourseViewPage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-brand-primary border-t-brand-accent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-[#082238] border-t-[#F5B82E] rounded-full animate-spin" />
       </div>
     );
   }
@@ -63,7 +63,7 @@ export const StudentCourseViewPage: React.FC = () => {
           <p className="text-sm text-slate-600 mb-6">{error || 'Cette formation n\'existe pas ou vous n\'y avez pas accès.'}</p>
           <Link
             to="/student/dashboard"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-primary text-white text-sm font-bold rounded-xl"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#082238] text-white text-sm font-bold rounded-xl"
           >
             <ArrowLeft className="w-4 h-4" />
             Retour à mon tableau de bord
@@ -94,11 +94,11 @@ export const StudentCourseViewPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
       {/* Header Banner */}
-      <div className="bg-brand-primary text-white py-10 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-[#082238] text-white py-10 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="max-w-6xl mx-auto relative z-10">
           <Link
             to="/student/dashboard"
-            className="inline-flex items-center gap-2 text-slate-300 hover:text-brand-accent text-sm font-semibold mb-6 transition-colors"
+            className="inline-flex items-center gap-2 text-slate-300 hover:text-[#F5B82E] text-sm font-semibold mb-6 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Tableau de bord</span>
@@ -106,8 +106,8 @@ export const StudentCourseViewPage: React.FC = () => {
 
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div className="max-w-3xl">
-              <span className="inline-block px-3 py-1 bg-brand-accent/20 text-brand-accent text-xs font-bold rounded-md mb-3 border border-brand-accent/30">
-                {course.category}
+              <span className="inline-block px-3 py-1 bg-[#F5B82E]/20 text-[#F5B82E] text-xs font-bold rounded-md mb-3 border border-[#F5B82E]/30">
+                {course.category || course.categoryName}
               </span>
               <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
                 {course.title}
@@ -118,16 +118,16 @@ export const StudentCourseViewPage: React.FC = () => {
 
               <div className="flex flex-wrap items-center gap-6 mt-6 text-xs text-slate-300">
                 <div className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-brand-accent" />
-                  <span>Durée : {course.duration}</span>
+                  <Clock className="w-4 h-4 text-[#F5B82E]" />
+                  <span>Durée : {course.duration || '30h'}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Layers className="w-4 h-4 text-brand-accent" />
+                  <Layers className="w-4 h-4 text-[#F5B82E]" />
                   <span>{course.modules.length} Modules ({totalLessons} leçons)</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Award className="w-4 h-4 text-brand-accent" />
-                  <span>Niveau : {course.level}</span>
+                  <Award className="w-4 h-4 text-[#F5B82E]" />
+                  <span>Niveau : {course.level || 'Tous niveaux'}</span>
                 </div>
               </div>
             </div>
@@ -143,7 +143,7 @@ export const StudentCourseViewPage: React.FC = () => {
               </div>
               <div className="w-full bg-black/30 rounded-full h-2.5 mb-6 overflow-hidden">
                 <div
-                  className="bg-brand-accent h-2.5 rounded-full transition-all duration-500"
+                  className="bg-[#F5B82E] h-2.5 rounded-full transition-all duration-500"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
@@ -151,9 +151,9 @@ export const StudentCourseViewPage: React.FC = () => {
               {nextLessonId && (
                 <Link
                   to={`/student/courses/${course.slug}/lesson/${nextLessonId}`}
-                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 bg-brand-accent hover:bg-brand-accent-hover text-brand-primary font-bold text-sm rounded-xl transition-all shadow-lg shadow-brand-accent/20"
+                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 bg-[#F5B82E] hover:bg-[#E5A91E] text-[#082238] font-bold text-sm rounded-xl transition-all shadow-lg"
                 >
-                  <Play className="w-4 h-4 fill-brand-primary" />
+                  <Play className="w-4 h-4 fill-[#082238]" />
                   <span>{progressPercent > 0 ? 'Continuer le cours' : 'Commencer le cours'}</span>
                 </Link>
               )}
@@ -165,7 +165,7 @@ export const StudentCourseViewPage: React.FC = () => {
       {/* Course Curriculum Modules & Lessons */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-black text-brand-primary tracking-tight">
+          <h2 className="text-2xl font-black text-[#082238] tracking-tight">
             Programme pédagogique & Leçons
           </h2>
           <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
@@ -181,10 +181,10 @@ export const StudentCourseViewPage: React.FC = () => {
             >
               <div className="p-6 bg-slate-50/70 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <div className="text-xs font-extrabold text-brand-accent uppercase tracking-wider">
+                  <div className="text-xs font-extrabold text-[#F5B82E] uppercase tracking-wider">
                     Module {mIdx + 1}
                   </div>
-                  <h3 className="text-lg font-black text-brand-primary mt-1">
+                  <h3 className="text-lg font-black text-[#082238] mt-1">
                     {module.title}
                   </h3>
                   {module.description && (
@@ -214,7 +214,7 @@ export const StudentCourseViewPage: React.FC = () => {
                               <CheckCircle2 className="w-5 h-5" />
                             </div>
                           ) : (
-                            <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-brand-primary group-hover:text-brand-accent text-slate-400 flex items-center justify-center transition-colors">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-[#082238] group-hover:text-[#F5B82E] text-slate-400 flex items-center justify-center transition-colors">
                               <Play className="w-3.5 h-3.5 ml-0.5" />
                             </div>
                           )}
@@ -225,17 +225,17 @@ export const StudentCourseViewPage: React.FC = () => {
                             <span className="text-xs font-bold text-slate-400">
                               {mIdx + 1}.{lIdx + 1}
                             </span>
-                            <h4 className="text-sm font-bold text-slate-800 group-hover:text-brand-primary transition-colors">
+                            <h4 className="text-sm font-bold text-slate-800 group-hover:text-[#082238] transition-colors">
                               {lesson.title}
                             </h4>
                           </div>
                           <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
                             <span className="flex items-center gap-1">
                               <Clock className="w-3 h-3 text-slate-400" />
-                              {lesson.duration}
+                              {lesson.duration || '20 min'}
                             </span>
                             {lesson.resources && lesson.resources.length > 0 && (
-                              <span className="flex items-center gap-1 text-brand-primary">
+                              <span className="flex items-center gap-1 text-[#082238]">
                                 <FileText className="w-3 h-3" />
                                 {lesson.resources.length} ressource(s)
                               </span>
@@ -250,7 +250,7 @@ export const StudentCourseViewPage: React.FC = () => {
                             Terminé
                           </span>
                         )}
-                        <span className="text-xs font-bold text-brand-primary group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                        <span className="text-xs font-bold text-[#082238] group-hover:translate-x-1 transition-transform flex items-center gap-1">
                           Voir la leçon →
                         </span>
                       </div>
