@@ -164,7 +164,7 @@ export const CurriculumPreview: React.FC<CurriculumPreviewProps> = ({
                 </h4>
                 
                 <div className="grid grid-cols-1 gap-2.5">
-                  {currentWeekData.topics.map((t, idx) => (
+                  {(currentWeekData.topics || currentWeekData.bulletPoints || []).map((t, idx) => (
                     <div 
                       key={idx} 
                       className="flex items-start gap-3 p-3.5 bg-slate-50/80 hover:bg-yellow-50/40 border border-slate-200/70 rounded-2xl text-xs sm:text-sm text-slate-800 font-medium transition-colors"

@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { ApplicationModal } from './components/common/ApplicationModal';
 
+// Public Pages
 import { HomePage } from './pages/HomePage';
 import { FormationDigitalPage } from './pages/FormationDigitalPage';
 import { FormationSeoPage } from './pages/FormationSeoPage';
@@ -12,220 +17,255 @@ import { ResourcesPage } from './pages/ResourcesPage';
 import { AboutPage } from './pages/AboutPage';
 import { FaqPage } from './pages/FaqPage';
 import { ContactPage } from './pages/ContactPage';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { CertificateVerifyPage } from './pages/CertificateVerifyPage';
+
+// Student LMS Pages
+import { StudentDashboardPage } from './pages/student/StudentDashboardPage';
+import { StudentCourseViewPage } from './pages/student/StudentCourseViewPage';
+import { StudentLessonPlayerPage } from './pages/student/StudentLessonPlayerPage';
+import { StudentCertificatesPage } from './pages/student/StudentCertificatesPage';
+import { StudentProfilePage } from './pages/student/StudentProfilePage';
+
+// Admin CRM & Settings
 import { AdminPage } from './pages/AdminPage';
 
-// Helper to determine initial page from browser path
-const getPageFromPath = (): { page: string; param?: string } => {
-  const path = window.location.pathname.toLowerCase();
-  const hash = window.location.hash.toLowerCase().replace('#', '');
+// ScrollToTop on route change helper
+const ScrollToTop: React.FC = () => {
+  const { pathname } = useLocation();
 
-  if (path === '/admin' || hash === 'admin' || path.startsWith('/admin')) return { page: 'admin' };
-  
-  // Flagship Marketing Digital Casablanca
-  if (
-    path === '/formation-marketing-digital-casablanca' ||
-    path === '/formation-marketing-digital-maroc' ||
-    path === '/formation' ||
-    path === '/formations' ||
-    hash === 'formation'
-  ) {
-    return { page: 'formation-marketing-digital-casablanca' };
-  }
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
-  // SEO Page
-  if (
-    path === '/formation-seo-casablanca' ||
-    path === '/formation-seo-maroc' ||
-    path === '/formation-seo' ||
-    path === '/cours-seo' ||
-    hash === 'seo'
-  ) {
-    return { page: 'formation-seo-casablanca' };
-  }
+  return null;
+};
 
-  // WordPress Page
-  if (
-    path === '/formation-wordpress-casablanca' ||
-    path === '/formation-wordpress-maroc' ||
-    path === '/formation-wordpress' ||
-    hash === 'wordpress'
-  ) {
-    return { page: 'formation-wordpress-casablanca' };
-  }
+// Layout with Navbar and Footer
+const MainLayout: React.FC<{ children: React.ReactNode; onOpenApplyModal: (intent?: 'programme' | 'candidature') => void }> = ({
+  children,
+  onOpenApplyModal,
+}) => {
+  const location = useLocation();
+  const isLessonPlayer = location.pathname.includes('/lesson/');
+  const isAdminPage = location.pathname.startsWith('/admin');
 
-  // Programme
-  if (path === '/programme-5-semaines' || path === '/programme' || path === '/syllabus' || hash === 'programme') {
-    return { page: 'programme-5-semaines' };
-  }
-
-  // Resources
-  if (path === '/ressources-seo' || path === '/ressources' || path === '/guides' || hash === 'ressources') {
-    return { page: 'ressources-seo' };
-  }
-
-  // About
-  if (path === '/a-propos' || path === '/about' || hash === 'about') {
-    return { page: 'a-propos' };
-  }
-
-  // FAQ
-  if (path === '/faq' || path === '/questions' || hash === 'faq') {
-    return { page: 'faq' };
-  }
-
-  // Contact
-  if (path === '/contact' || path === '/candidater' || path === '/inscription' || hash === 'contact') {
-    return { page: 'contact' };
-  }
-
-  return { page: 'home' };
+  return (
+    <div className="min-h-screen flex flex-col bg-[#F8FAFD] text-slate-900 font-sans selection:bg-[#F5B716] selection:text-slate-950">
+      {!isLessonPlayer && !isAdminPage && <Navbar onOpenApplyModal={onOpenApplyModal} />}
+      <main className="flex-1">{children}</main>
+      {!isLessonPlayer && !isAdminPage && <Footer onOpenApplyModal={onOpenApplyModal} />}
+    </div>
+  );
 };
 
 export const AppContent: React.FC = () => {
-  const initial = getPageFromPath();
-  const [currentPage, setCurrentPage] = useState(initial.page);
-
-  // Application Modal state
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [applyModalIntent, setApplyModalIntent] = useState<'programme' | 'candidature'>('candidature');
+  const navigate = useNavigate();
 
   const openApplyModal = (intent: 'programme' | 'candidature' = 'candidature') => {
     setApplyModalIntent(intent);
     setIsApplyModalOpen(true);
   };
 
-  // Sync with browser back/forward buttons
-  useEffect(() => {
-    const onPopState = () => {
-      const current = getPageFromPath();
-      setCurrentPage(current.page);
-    };
-
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  }, []);
-
-  const handleNavigate = (page: string, param?: string) => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    let urlPath = '/';
-    if (page === 'home') urlPath = '/';
-    else if (page === 'formation' || page === 'formation-marketing-digital-casablanca') urlPath = '/formation-marketing-digital-casablanca';
-    else if (page === 'formation-seo-casablanca') urlPath = '/formation-seo-casablanca';
-    else if (page === 'formation-wordpress-casablanca') urlPath = '/formation-wordpress-casablanca';
-    else if (page === 'programme' || page === 'programme-5-semaines') urlPath = '/programme-5-semaines';
-    else if (page === 'ressources-seo') urlPath = '/ressources-seo';
-    else if (page === 'about' || page === 'a-propos') urlPath = '/a-propos';
-    else if (page === 'faq') urlPath = '/faq';
-    else if (page === 'contact') urlPath = '/contact';
-    else if (page === 'admin') urlPath = '/admin';
-
-    try {
-      window.history.pushState(null, '', urlPath);
-    } catch (e) {
-      // fallback
+  // Compatibility navigation function for child components expecting onNavigate prop
+  const handleNavigate = (page: string) => {
+    switch (page) {
+      case 'home':
+        navigate('/');
+        break;
+      case 'formation':
+      case 'formation-marketing-digital-casablanca':
+        navigate('/formation-marketing-digital-casablanca');
+        break;
+      case 'formation-seo-casablanca':
+        navigate('/formation-seo-casablanca');
+        break;
+      case 'formation-wordpress-casablanca':
+        navigate('/formation-wordpress-casablanca');
+        break;
+      case 'programme':
+      case 'programme-5-semaines':
+        navigate('/programme-5-semaines');
+        break;
+      case 'ressources-seo':
+      case 'ressources':
+        navigate('/ressources-seo');
+        break;
+      case 'about':
+      case 'a-propos':
+        navigate('/a-propos');
+        break;
+      case 'faq':
+        navigate('/faq');
+        break;
+      case 'contact':
+        navigate('/contact');
+        break;
+      case 'admin':
+        navigate('/admin');
+        break;
+      default:
+        navigate('/');
     }
-
-    setCurrentPage(page);
   };
 
-  const isAdmin = currentPage === 'admin';
-
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFD] text-slate-900 font-sans selection:bg-[#F5B716] selection:text-slate-950">
-      
-      {/* Navbar (hidden in admin mode) */}
-      {!isAdmin && (
-        <Navbar
-          activePage={currentPage}
-          onNavigate={handleNavigate}
-          onOpenApplyModal={openApplyModal}
+    <MainLayout onOpenApplyModal={openApplyModal}>
+      <ScrollToTop />
+      <Routes>
+        {/* Public Routes */}
+        <Route
+          path="/"
+          element={<HomePage onNavigate={handleNavigate} onOpenApplyModal={openApplyModal} />}
         />
-      )}
+        <Route
+          path="/formation-marketing-digital-casablanca"
+          element={<FormationDigitalPage onNavigate={handleNavigate} onOpenApplyModal={openApplyModal} />}
+        />
+        <Route
+          path="/formation-seo-casablanca"
+          element={<FormationSeoPage onNavigate={handleNavigate} onOpenApplyModal={openApplyModal} />}
+        />
+        <Route
+          path="/formation-wordpress-casablanca"
+          element={<FormationWordPressPage onNavigate={handleNavigate} onOpenApplyModal={openApplyModal} />}
+        />
+        <Route
+          path="/formations"
+          element={<Navigate to="/formation-marketing-digital-casablanca" replace />}
+        />
+        <Route
+          path="/programme-5-semaines"
+          element={<ProgrammePage onNavigate={handleNavigate} onOpenApplyModal={openApplyModal} />}
+        />
+        <Route
+          path="/ressources-seo"
+          element={<ResourcesPage onNavigate={handleNavigate} onOpenApplyModal={openApplyModal} />}
+        />
+        <Route
+          path="/a-propos"
+          element={<AboutPage onNavigate={handleNavigate} onOpenApplyModal={openApplyModal} />}
+        />
+        <Route
+          path="/faq"
+          element={<FaqPage onNavigate={handleNavigate} onOpenApplyModal={openApplyModal} />}
+        />
+        <Route
+          path="/contact"
+          element={<ContactPage />}
+        />
+        <Route
+          path="/login"
+          element={<LoginPage />}
+        />
+        <Route
+          path="/register"
+          element={<RegisterPage />}
+        />
+        <Route
+          path="/certificates/:certificateNumber"
+          element={<CertificateVerifyPage />}
+        />
 
-      {/* Main Content Area */}
-      <main className="flex-1">
-        {currentPage === 'home' && (
-          <HomePage
-            onNavigate={handleNavigate}
-            onOpenApplyModal={openApplyModal}
-          />
-        )}
+        {/* Student Protected LMS Routes */}
+        <Route
+          path="/student"
+          element={
+            <ProtectedRoute>
+              <Navigate to="/student/dashboard" replace />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/dashboard"
+          element={
+            <ProtectedRoute>
+              <StudentDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/courses"
+          element={
+            <ProtectedRoute>
+              <Navigate to="/student/dashboard" replace />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/courses/:slug"
+          element={
+            <ProtectedRoute>
+              <StudentCourseViewPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/courses/:slug/lesson/:lessonId"
+          element={
+            <ProtectedRoute>
+              <StudentLessonPlayerPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/certificates"
+          element={
+            <ProtectedRoute>
+              <StudentCertificatesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/profile"
+          element={
+            <ProtectedRoute>
+              <StudentProfilePage />
+            </ProtectedRoute>
+          }
+        />
 
-        {(currentPage === 'formation' || currentPage === 'formation-marketing-digital-casablanca') && (
-          <FormationDigitalPage
-            onNavigate={handleNavigate}
-            onOpenApplyModal={openApplyModal}
-          />
-        )}
+        {/* Admin Protected Routes */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
+              <AdminPage onNavigate={handleNavigate} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
+              <AdminPage onNavigate={handleNavigate} />
+            </ProtectedRoute>
+          }
+        />
 
-        {currentPage === 'formation-seo-casablanca' && (
-          <FormationSeoPage
-            onNavigate={handleNavigate}
-            onOpenApplyModal={openApplyModal}
-          />
-        )}
+        {/* Fallback 404 Route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
 
-        {currentPage === 'formation-wordpress-casablanca' && (
-          <FormationWordPressPage
-            onNavigate={handleNavigate}
-            onOpenApplyModal={openApplyModal}
-          />
-        )}
-
-        {(currentPage === 'programme' || currentPage === 'programme-5-semaines') && (
-          <ProgrammePage
-            onNavigate={handleNavigate}
-            onOpenApplyModal={openApplyModal}
-          />
-        )}
-
-        {currentPage === 'ressources-seo' && (
-          <ResourcesPage
-            onNavigate={handleNavigate}
-            onOpenApplyModal={openApplyModal}
-          />
-        )}
-
-        {(currentPage === 'about' || currentPage === 'a-propos') && (
-          <AboutPage
-            onNavigate={handleNavigate}
-            onOpenApplyModal={openApplyModal}
-          />
-        )}
-
-        {currentPage === 'faq' && (
-          <FaqPage
-            onNavigate={handleNavigate}
-            onOpenApplyModal={openApplyModal}
-          />
-        )}
-
-        {currentPage === 'contact' && (
-          <ContactPage />
-        )}
-
-        {currentPage === 'admin' && (
-          <AdminPage
-            onNavigate={handleNavigate}
-          />
-        )}
-      </main>
-
-      {/* Footer (hidden in admin mode) */}
-      {!isAdmin && <Footer onNavigate={handleNavigate} onOpenApplyModal={openApplyModal} />}
-
-      {/* Reusable Lead & Application Modal */}
+      {/* Global Application Modal */}
       <ApplicationModal
         isOpen={isApplyModalOpen}
         intent={applyModalIntent}
         onClose={() => setIsApplyModalOpen(false)}
       />
-
-    </div>
+    </MainLayout>
   );
 };
 
 export default function App() {
-  return <AppContent />;
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </BrowserRouter>
+  );
 }

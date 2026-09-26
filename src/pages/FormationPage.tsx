@@ -341,7 +341,7 @@ export const FormationPage: React.FC<FormationPageProps> = ({ onNavigate, onOpen
                         Modules abordés
                       </h4>
                       <ul className="space-y-1.5 text-xs text-slate-700">
-                        {week.topics.map((t, i) => (
+                        {(week.topics || week.bulletPoints || []).map((t: string, i: number) => (
                           <li key={i} className="flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#F5B716]" />
                             <span>{t}</span>

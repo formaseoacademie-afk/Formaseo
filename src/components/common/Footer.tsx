@@ -1,9 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { MapPin, ShieldCheck, ArrowRight, Phone, Mail } from 'lucide-react';
 import { Logo } from './Logo';
 
 interface FooterProps {
-  onNavigate: (page: string) => void;
+  onNavigate?: (page: string) => void;
   onOpenApplyModal?: (intent?: 'programme' | 'candidature') => void;
 }
 
@@ -15,17 +16,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenApplyModal }) 
         {/* Top summary row */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 pb-12 border-b border-slate-800">
           <div className="lg:col-span-6 space-y-4">
-            <a
-              href="/"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('home');
-              }}
+            <Link
+              to="/"
               className="cursor-pointer inline-block"
               title="FormaSEO.ma"
             >
               <Logo variant="light" />
-            </a>
+            </Link>
             <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-md pt-2">
               FormaSEO.ma propose des formations pratiques à Casablanca axées sur le marketing digital, la création de sites WordPress, le référencement naturel (SEO) et la mesure de résultats réels.
             </p>
@@ -65,16 +62,12 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenApplyModal }) 
                 </button>
               )}
 
-              <a
-                href="/programme-5-semaines"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onNavigate('programme-5-semaines');
-                }}
+              <Link
+                to="/programme-5-semaines"
                 className="px-5 py-2.5 rounded-full border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors cursor-pointer inline-flex items-center"
               >
                 <span>Découvrir le programme 5 semaines</span>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -88,52 +81,36 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenApplyModal }) 
             </h5>
             <ul className="space-y-2 text-slate-300">
               <li>
-                <a
-                  href="/formation-marketing-digital-casablanca"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate('formation-marketing-digital-casablanca');
-                  }}
+                <Link
+                  to="/formation-marketing-digital-casablanca"
                   className="hover:text-white transition-colors"
                 >
                   Formation Marketing Digital (Casablanca)
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/formation-seo-casablanca"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate('formation-seo-casablanca');
-                  }}
+                <Link
+                  to="/formation-seo-casablanca"
                   className="hover:text-white transition-colors"
                 >
                   Formation SEO & Référencement Google
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/formation-wordpress-casablanca"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate('formation-wordpress-casablanca');
-                  }}
+                <Link
+                  to="/formation-wordpress-casablanca"
                   className="hover:text-white transition-colors"
                 >
                   Formation WordPress & Création de Site
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/programme-5-semaines"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate('programme-5-semaines');
-                  }}
+                <Link
+                  to="/programme-5-semaines"
                   className="hover:text-white transition-colors"
                 >
                   Programme Détaillé 5 Semaines
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -144,52 +121,36 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenApplyModal }) 
             </h5>
             <ul className="space-y-2 text-slate-300">
               <li>
-                <a
-                  href="/a-propos"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate('a-propos');
-                  }}
+                <Link
+                  to="/a-propos"
                   className="hover:text-white transition-colors"
                 >
                   À Propos de FormaSEO.ma
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/a-propos"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate('a-propos');
-                  }}
+                <Link
+                  to="/a-propos"
                   className="hover:text-white transition-colors"
                 >
                   Formateur (Wassim Kassy)
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/ressources-seo"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate('ressources-seo');
-                  }}
+                <Link
+                  to="/ressources-seo"
                   className="hover:text-white transition-colors"
                 >
                   Guides & Tutoriels SEO Maroc
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/contact"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate('contact');
-                  }}
+                <Link
+                  to="/contact"
                   className="hover:text-white transition-colors"
                 >
                   Centre Casablanca (Mers Sultan)
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -200,54 +161,59 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenApplyModal }) 
             </h5>
             <ul className="space-y-2 text-slate-300">
               <li>
-                <a
-                  href="/contact"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate('contact');
-                  }}
+                <Link
+                  to="/contact"
                   className="hover:text-white transition-colors"
                 >
                   Déposer une Candidature
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/faq"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate('faq');
-                  }}
+                <Link
+                  to="/faq"
                   className="hover:text-white transition-colors"
                 >
                   Foire Aux Questions (FAQ)
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/contact"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate('contact');
-                  }}
+                <Link
+                  to="/contact"
                   className="hover:text-white transition-colors"
                 >
                   Contacter par WhatsApp / Téléphone
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
 
           <div className="space-y-3">
             <h5 className="font-extrabold uppercase tracking-wider text-[#F5B716] text-[11px]">
-              Transparence & Mentions
+              Espace Membre & Sécurité
             </h5>
-            <p className="text-slate-400 text-[11px] leading-relaxed">
-              FormaSEO.ma • Académie de formation pratique au SEO, marketing digital et création de site WordPress basée à Casablanca, Maroc.
-            </p>
-            <div className="text-[10px] text-slate-500">
-              * Ce site officiel concerne l'académie marocaine formaseo.ma.
-            </div>
+            <ul className="space-y-2 text-slate-300">
+              <li>
+                <Link
+                  to="/login"
+                  className="hover:text-white transition-colors"
+                >
+                  Espace Étudiant / Connexion
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/admin"
+                  className="hover:text-white transition-colors"
+                >
+                  Accès Administration
+                </Link>
+              </li>
+              <li>
+                <span className="text-slate-400 text-[11px] leading-relaxed block pt-1">
+                  FormaSEO.ma • Académie de formation pratique basée à Casablanca, Maroc.
+                </span>
+              </li>
+            </ul>
           </div>
 
         </div>

@@ -176,14 +176,12 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({ onNavigate, onOpen
                         <h4 className="text-xs font-black uppercase tracking-wider text-slate-900">
                           Programme des séances et concepts abordés :
                         </h4>
-                        <div className="space-y-2.5">
-                          {week.topics.map((topic, idx) => (
+                          {(week.topics || week.bulletPoints || []).map((topic: string, idx: number) => (
                             <div key={idx} className="flex items-start gap-3 p-3 bg-white rounded-xl border border-slate-100 text-xs sm:text-sm text-slate-700">
                               <CheckCircle2 className="w-4 h-4 text-[#F5B716] shrink-0 mt-0.5" />
                               <span>{topic}</span>
                             </div>
                           ))}
-                        </div>
                       </div>
 
                       {/* Practical Workshop & Tools */}

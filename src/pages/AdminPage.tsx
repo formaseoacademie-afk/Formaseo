@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   LayoutDashboard,
   CheckCircle2,
@@ -34,18 +35,16 @@ import {
   Award,
 } from 'lucide-react';
 import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { AcademySettings, CurriculumWeek, FaqItem, Enquiry } from '../types';
 import { fallbackSettings, fallbackCurriculum, fallbackFaqs } from '../config/defaultData';
 
 interface AdminPageProps {
-  onNavigate: (page: string, param?: string) => void;
+  onNavigate?: (page: string, param?: string) => void;
 }
 
 export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
-  // Direct Auth Gate
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [passwordInput, setPasswordInput] = useState('');
-  const [authError, setAuthError] = useState('');
+  const { user, isAuthenticated } = useAuth();
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<'checklist' | 'enquiries' | 'settings' | 'curriculum' | 'faqs'>('enquiries');
@@ -76,25 +75,14 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
   const [newChecklistLabel, setNewChecklistLabel] = useState('');
   const [newChecklistCategory, setNewChecklistCategory] = useState('Lancement');
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passwordInput === 'admin' || passwordInput === 'formaseo2026' || passwordInput === 'admin123') {
-      setIsAuthenticated(true);
-      setAuthError('');
-      loadData();
-    } else {
-      setAuthError('Mot de passe incorrect. Accès strictement réservé à la direction FormaSEO.ma.');
-    }
-  };
-
   const loadData = async () => {
     setLoading(true);
     try {
       const [st, cur, fq, enq, chk] = await Promise.all([
-        api.getSettings(),
-        api.getCurriculum(),
-        api.getFaqs(),
-        api.getEnquiries(),
+        api.settings.get(),
+        api.curriculum.get(),
+        api.faqs.get(),
+        api.enquiries.getAll(),
         api.getChecklist(),
       ]);
       if (st) setSettings(st);
@@ -103,7 +91,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
       if (enq) setEnquiries(enq);
       if (chk) setChecklist(chk);
     } catch (e) {
-      console.error(e);
+      console.error('Error loading admin data:', e);
     } finally {
       setLoading(false);
     }
@@ -241,9 +229,9 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
     if (!faqForm.question.trim() || !faqForm.answer.trim()) return;
 
     if (editingFaqId) {
-      const updated = await api.updateFaq(editingFaqId, faqForm);
-      if (updated) {
-        setFaqs(faqs.map((f) => (f.id === editingFaqId ? updated : f)));
+      const ok = await api.updateFaq(editingFaqId, faqForm);
+      if (ok) {
+        setFaqs(faqs.map((f) => (f.id === editingFaqId ? { ...f, ...faqForm } : f)));
         showNotification('Question FAQ mise à jour.');
       }
     } else {
@@ -266,60 +254,36 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
     showNotification('Question FAQ supprimée.');
   };
 
-  // If NOT authenticated, show confidential login screen
-  if (!isAuthenticated) {
+  // If NOT authenticated, show message to login
+  if (!isAuthenticated || !user || !['SUPER_ADMIN', 'ADMIN'].includes(user.role)) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-        <div className="max-w-md w-full bg-white rounded-3xl border border-slate-200 shadow-xl p-8 space-y-6">
-          <div className="text-center space-y-2">
-            <div className="w-14 h-14 rounded-2xl bg-[#082238] text-[#F5B82E] flex items-center justify-center mx-auto shadow-md">
-              <Lock className="w-6 h-6" />
-            </div>
-            <h1 className="text-2xl font-black text-slate-900">Espace Administration</h1>
-            <p className="text-xs text-slate-500">
-              Accès protégé réservé à la direction et au propriétaire de <strong>FormaSEO.ma</strong>.
+        <div className="max-w-md w-full bg-white rounded-3xl border border-slate-200 shadow-xl p-8 space-y-6 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-[#082238] text-[#F5B82E] flex items-center justify-center mx-auto shadow-md">
+            <Lock className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-black text-slate-900">Accès Restreint</h1>
+            <p className="text-xs text-slate-500 mt-2">
+              Vous devez être connecté avec un compte Administrateur pour accéder à ce panneau.
             </p>
           </div>
 
-          {authError && (
-            <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{authError}</span>
-            </div>
-          )}
+          <Link
+            to="/login?redirect=/admin"
+            className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-xl bg-brand-primary hover:bg-slate-800 text-white font-bold text-sm transition-all shadow-md"
+          >
+            <ShieldCheck className="w-4 h-4 text-brand-accent" />
+            <span>Se connecter en tant qu'administrateur</span>
+          </Link>
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Code d'accès administrateur
-              </label>
-              <input
-                type="password"
-                required
-                placeholder="Entrez le mot de passe (admin)..."
-                value={passwordInput}
-                onChange={(e) => setPasswordInput(e.target.value)}
-                className="w-full p-3.5 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#F5B82E]"
-                autoFocus
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3.5 rounded-full bg-[#082238] hover:bg-slate-800 text-white font-black text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <ShieldCheck className="w-4 h-4 text-[#F5B82E]" />
-              <span>Déverrouiller le panneau</span>
-            </button>
-          </form>
-
-          <div className="pt-2 text-center">
-            <button
-              onClick={() => onNavigate('home')}
-              className="text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+          <div className="pt-2">
+            <Link
+              to="/"
+              className="text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors"
             >
               ← Retour au site public
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -369,15 +333,18 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#F5B82E]' : ''}`} />
               </button>
-              <button
-                onClick={() => onNavigate('home')}
+              <Link
+                to="/"
                 className="px-3.5 py-2 rounded-full border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Voir le site</span>
                 <ExternalLink className="w-3.5 h-3.5" />
-              </button>
+              </Link>
               <button
-                onClick={() => setIsAuthenticated(false)}
+                onClick={() => {
+                  api.auth.logout();
+                  window.location.href = '/';
+                }}
                 className="px-3.5 py-2 rounded-full bg-red-500/20 hover:bg-red-500/30 text-red-300 text-xs font-bold transition-colors cursor-pointer"
               >
                 Déconnexion

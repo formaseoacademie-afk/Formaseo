@@ -1,79 +1,51 @@
-export interface CurriculumWeek {
-  weekNumber: number;
-  title: string;
-  focus?: string;
-  hours?: string;
-  objective?: string;
-  topics: string[];
-  tools?: string[];
-  deliverable?: string;
-  practicalWorkshop?: string;
-  confirmationStatus?: 'proposé' | 'validé';
-}
+export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'INSTRUCTOR' | 'STUDENT';
 
-export interface AcademySettings {
-  name?: string;
-  academyName?: string;
-  domain?: string;
-  city?: string;
-  address?: string;
-  addressNote?: string;
-  founderName?: string;
-  founderRole?: string;
-  founderStatus?: string;
-  headline?: string;
-  subtitle?: string;
-  formatDescription?: string;
-  proposedDuration?: string;
-  duration?: string;
-  nextSessionDate?: string;
-  proposedPriceNote?: string;
-  priceNote?: string;
-  email?: string;
-  phone?: string;
-  includedItemsNote?: string[];
-  audiences?: { title: string; subtitle: string; description: string; icon: string }[];
-  toolsCovered?: { name: string; category: string; description: string }[];
-  ownerChecklist?: { id: string; label?: string; title?: string; category?: string; status: 'en_attente' | 'confirmé' | 'approved' | 'pending'; notes?: string; currentValue?: string; description?: string }[];
-}
-
-export interface Enquiry {
+export interface User {
   id: string;
-  name: string;
   email: string;
-  phone: string;
-  profileType: 'entrepreneur' | 'freelance' | 'etudiant' | 'professionnel' | 'student' | 'business_owner' | 'autre';
-  goal: string;
-  preferredFormat: 'presentiel_casablanca' | 'en_ligne' | 'flexible' | 'presential' | 'online' | 'hybrid';
-  consent?: boolean;
-  createdAt: string;
-  status: 'new' | 'in_review' | 'contacted' | 'enrolled' | 'archived';
-  notes?: string;
+  name: string;
+  role: UserRole;
+  phone?: string;
+  avatar?: string;
+  avatarUrl?: string;
+  bio?: string;
+  enrolledCourseIds?: string[];
+  completedLessonIds?: string[];
+  createdAt?: string;
 }
 
-export interface FaqItem {
-  id: string | number;
-  question: string;
-  answer: string;
-  category: string;
-  needsConfirmation?: boolean;
+export interface LessonResource {
+  id: string;
+  title: string;
+  url: string;
+  type?: string;
+  fileType?: string;
+  fileSize?: string;
 }
 
-// Backward compatibility types
 export interface Lesson {
   id: string;
+  moduleId: string;
   title: string;
+  summary?: string;
+  description?: string;
+  content?: string;
+  videoUrl?: string;
   durationMinutes?: number;
   duration?: string;
-  summary?: string;
-  videoUrl?: string;
-  type?: 'video' | 'quiz' | 'workshop';
+  position: number;
+  isFreePreview?: boolean;
+  type?: 'video' | 'quiz' | 'workshop' | string;
+  resources?: LessonResource[];
 }
 
 export interface Module {
   id: string;
+  courseId?: string;
   title: string;
+  description?: string;
   durationHours?: number;
+  position: number;
   lessons: Lesson[];
 }
 
@@ -82,21 +54,21 @@ export interface Course {
   slug: string;
   title: string;
   shortDescription: string;
-  fullDescription: string;
-  category: string;
-  categoryName: string;
-  level: string;
-  durationHours: number;
-  priceMAD: number;
+  fullDescription?: string;
+  categoryId?: string;
+  categoryName?: string;
+  category?: string;
+  level?: string;
+  duration?: string;
+  durationHours?: number;
+  priceMAD?: number;
+  priceEUR?: number;
   originalPriceMAD?: number;
-  priceEUR: number;
-  rating: number;
-  reviewCount: number;
-  reviewsCount?: number;
-  studentCount: number;
-  studentsCount?: number;
-  totalLessons?: number;
-  badge?: string;
+  rating?: number;
+  reviewCount?: number;
+  studentCount?: number;
+  thumbnail: string;
+  instructorId?: string;
   instructorName?: string;
   instructorRole?: string;
   instructor?: {
@@ -105,33 +77,173 @@ export interface Course {
     avatar: string;
     bio?: string;
   };
-  thumbnail: string;
-  learningOutcomes: string[];
-  prerequisites: string[];
+  published?: boolean;
+  badge?: string;
+  learningOutcomes?: string[];
+  prerequisites?: string[];
   modules: Module[];
+  isEnrolled?: boolean;
 }
 
-export interface Category {
+export interface Enrollment {
   id: string;
-  slug: string;
-  name: string;
+  userId: string;
+  courseId: string;
+  status: 'active' | 'completed' | 'suspended' | 'cancelled' | 'ACTIVE' | 'COMPLETED';
+  enrolledAt: string;
+  completedAt?: string;
+  course?: Course;
+  progressPercentage?: number;
+}
+
+export interface LessonProgress {
+  id?: string;
+  userId?: string;
+  lessonId: string;
+  courseId?: string;
+  completed: boolean;
+  progressPercent?: number;
+  lastWatchedSeconds?: number;
+  completedAt?: string;
+  updatedAt?: string;
+}
+
+export interface CourseProgressStats {
+  totalLessons: number;
+  completedLessons: number;
+  percent: number;
+}
+
+export interface Certificate {
+  id: string;
+  certificateNumber: string;
+  userId: string;
+  courseId: string;
+  studentName?: string;
+  userName?: string;
+  courseTitle: string;
+  issuedAt: string;
+  verificationToken: string;
+  score?: number;
+}
+
+export interface AudienceItem {
+  title: string;
+  subtitle: string;
   description: string;
-  iconName?: string;
-  icon?: string;
-  courseCount: number;
+  icon: string;
+}
+
+export interface ToolCoveredItem {
+  name: string;
+  category: string;
+  description: string;
+}
+
+export interface ChecklistItem {
+  id: string;
+  label: string;
+  status: 'en_attente' | 'confirmé' | 'approved' | string;
+  notes?: string;
+  category?: string;
+}
+
+export interface AcademySettings {
+  name?: string;
+  academyName?: string;
+  tagline?: string;
+  domain?: string;
+  city?: string;
+  address?: string;
+  addressNote?: string;
+  founderName?: string;
+  founderRole?: string;
+  founderStatus?: string;
+  founderBio?: string;
+  headline?: string;
+  heroHeadline?: string;
+  subtitle?: string;
+  heroSubheadline?: string;
+  formatDescription?: string;
+  duration?: string;
+  proposedDuration?: string;
+  priceNote?: string;
+  proposedPriceNote?: string;
+  phone?: string;
+  whatsapp?: string;
+  email?: string;
+  priceMAD?: number;
+  priceEUR?: number;
+  nextCohortDate?: string;
+  nextSessionDate?: string;
+  seatsTotal?: number;
+  seatsRemaining?: number;
+  activePromotion?: boolean;
+  promoDiscountMAD?: number;
+  instructorName?: string;
+  instructorBio?: string;
+  instructorRole?: string;
+  bannerMessage?: string;
+  enableLiveChat?: boolean;
+  includedItemsNote?: string[];
+  audiences?: AudienceItem[];
+  toolsCovered?: ToolCoveredItem[];
+  ownerChecklist?: ChecklistItem[];
+}
+
+export interface CurriculumWeek {
+  id?: string;
+  weekNumber: number;
+  title: string;
+  subtitle?: string;
+  focus?: string;
+  objective?: string;
+  tag?: string;
+  description?: string;
+  topics?: string[];
+  bulletPoints?: string[];
+  tools?: string[];
+  hours?: string;
+  practicalWorkshop?: string;
+  deliverable?: string;
+  estimatedHours?: number;
+  status?: string;
+  confirmationStatus?: string;
+}
+
+export interface FaqItem {
+  id: string;
+  question: string;
+  answer: string;
+  category: string;
+  order?: number;
+  needsConfirmation?: boolean;
+}
+
+export interface Enquiry {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  fullName?: string;
+  profileType?: string;
+  goal?: string;
+  preferredFormat?: string;
+  status: 'new' | 'contacted' | 'in_review' | 'enrolled' | 'archived';
+  notes?: string;
+  createdAt: string;
 }
 
 export interface Review {
   id: string;
-  studentName?: string;
-  studentRole?: string;
-  userName?: string;
+  authorName: string;
+  authorRole: string;
+  authorCompany?: string;
+  authorAvatar?: string;
   rating: number;
   comment: string;
+  courseSlug: string;
   date: string;
-  courseTitle?: string;
-  avatarUrl?: string;
-  userAvatar?: string;
 }
 
 export interface Article {
@@ -141,30 +253,12 @@ export interface Article {
   excerpt: string;
   content: string;
   category: string;
-  author: string;
-  date?: string;
-  publishedAt?: string;
-  readTimeMinutes?: number;
-  readTime?: string;
-  imageUrl?: string;
-  coverImage?: string;
+  readTime: string;
+  publishedAt: string;
+  author: {
+    name: string;
+    role: string;
+    avatar: string;
+  };
   tags: string[];
-}
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'student' | 'instructor' | 'admin';
-  avatar?: string;
-  enrolledCourseIds: string[];
-  completedLessonIds: string[];
-}
-
-export interface Stats {
-  totalStudents: number;
-  satisfactionRate: number;
-  totalHoursTraining: number;
-  certificationsIssued: number;
-  partnerCompanies: number;
 }

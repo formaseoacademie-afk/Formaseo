@@ -1,4 +1,534 @@
 {
+  "users": [
+    {
+      "id": "usr-admin-1",
+      "email": "admin@formaseo.ma",
+      "passwordHash": "$2b$10$hsKoRvI6tXsFSOK5ZXIkn.B3m1W.DuuszrGpz5GMn/E0USXHi7FuK",
+      "name": "Direction FormaSEO",
+      "role": "SUPER_ADMIN",
+      "phone": "+212 6 00 00 00 00",
+      "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+      "bio": "Direction Pédagogique et Fondateur de l’Académie FormaSEO.ma",
+      "createdAt": "2026-09-26T15:45:04.457Z",
+      "updatedAt": "2026-09-26T15:45:04.459Z"
+    },
+    {
+      "id": "usr-instructor-1",
+      "email": "wassim@formaseo.ma",
+      "passwordHash": "$2b$10$hsKoRvI6tXsFSOK5ZXIkn.B3m1W.DuuszrGpz5GMn/E0USXHi7FuK",
+      "name": "Wassim Kassy",
+      "role": "INSTRUCTOR",
+      "phone": "+212 6 11 22 33 44",
+      "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
+      "bio": "Consultant SEO & Formateur Référencement Naturel à Casablanca",
+      "createdAt": "2026-09-26T15:45:04.459Z",
+      "updatedAt": "2026-09-26T15:45:04.459Z"
+    },
+    {
+      "id": "usr-student-1",
+      "email": "etudiant@formaseo.ma",
+      "passwordHash": "$2b$10$w8BUY7hmtKtb0ibhiKFRs.mOWxBgyhzK0FtENXcBsilnoqHe3HvAS",
+      "name": "Karim Mansouri",
+      "role": "STUDENT",
+      "phone": "+212 6 99 88 77 66",
+      "avatarUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
+      "bio": "Étudiant en reconversion Marketing Digital & SEO",
+      "createdAt": "2026-09-26T15:45:04.459Z",
+      "updatedAt": "2026-09-26T15:45:04.459Z"
+    }
+  ],
+  "courses": [
+    {
+      "id": "crs-digital-1",
+      "slug": "formation-marketing-digital-casablanca",
+      "title": "Formation Marketing Digital & SEO Casablanca",
+      "shortDescription": "Programme complet de 5 semaines pour créer votre site WordPress professionnel et le positionner sur Google.",
+      "fullDescription": "La formation phare de FormaSEO.ma à Casablanca. Vous apprenez en pratiquant directement sur un projet réel déployé sur votre propre nom de domaine.",
+      "categoryId": "cat-seo",
+      "categoryName": "SEO & Marketing Digital",
+      "level": "Tous niveaux (Débutant à Intermédiaire)",
+      "durationHours": 40,
+      "priceMAD": 3500,
+      "priceEUR": 320,
+      "rating": 4.95,
+      "reviewCount": 48,
+      "studentCount": 142,
+      "thumbnail": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80",
+      "instructorId": "usr-instructor-1",
+      "instructorName": "Wassim Kassy",
+      "instructorRole": "Consultant & Formateur SEO",
+      "published": true,
+      "learningOutcomes": [
+        "Créer et administrer un site WordPress rapide et sécurisé",
+        "Réaliser une recherche de mots-clés rentable sur le marché marocain",
+        "Rédiger des pages et articles optimisés pour le référencement naturel",
+        "Configurer Google Search Console et Google Analytics GA4",
+        "Dominer les recherches locales sur Google Maps à Casablanca"
+      ],
+      "prerequisites": [
+        "Savoir naviguer sur un ordinateur",
+        "Avoir une idée de projet ou d’activité"
+      ],
+      "createdAt": "2026-09-26T15:45:04.459Z",
+      "updatedAt": "2026-09-26T15:45:04.459Z",
+      "modules": [
+        {
+          "id": "mod-1",
+          "courseId": "crs-digital-1",
+          "title": "Semaine 01 : Création de Site WordPress & Infrastructure",
+          "description": "Nom de domaine, hébergement, architecture et mise en ligne complète.",
+          "position": 1,
+          "lessons": [
+            {
+              "id": "les-1-1",
+              "moduleId": "mod-1",
+              "title": "Introduction & Choix du Nom de Domaine",
+              "summary": "Comprendre le fonctionnement des DNS, serveurs et noms de domaine.",
+              "content": "Dans cette leçon, nous configurons votre nom de domaine et votre hébergement web optimisé pour WordPress.",
+              "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+              "durationMinutes": 25,
+              "position": 1,
+              "isFreePreview": true,
+              "resources": [
+                {
+                  "id": "res-1",
+                  "title": "Checklist Nom de Domaine SEO (PDF)",
+                  "url": "/ressources-seo",
+                  "fileType": "pdf"
+                }
+              ]
+            },
+            {
+              "id": "les-1-2",
+              "moduleId": "mod-1",
+              "title": "Installation Propre de WordPress & Thème Léger",
+              "summary": "Installation pas à pas, configuration des permaliens et choix de thème.",
+              "content": "Guide pratique pour installer WordPress sans surcharge et configurer les options indispensables.",
+              "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+              "durationMinutes": 35,
+              "position": 2,
+              "isFreePreview": false
+            },
+            {
+              "id": "les-1-3",
+              "moduleId": "mod-1",
+              "title": "Création des Pages Stratégiques (Accueil, Services, Contact)",
+              "summary": "Structure des pages clés et ergonomie de conversion.",
+              "content": "Construction visuelle des gabarits essentiels de votre site vitrine ou e-commerce.",
+              "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+              "durationMinutes": 40,
+              "position": 3,
+              "isFreePreview": false
+            }
+          ]
+        },
+        {
+          "id": "mod-2",
+          "courseId": "crs-digital-1",
+          "title": "Semaine 02 : Recherche Mots-Clés & Rédaction SEO",
+          "description": "Intentions de recherche, Google Keyword Planner et cocon sémantique.",
+          "position": 2,
+          "lessons": [
+            {
+              "id": "les-2-1",
+              "moduleId": "mod-2",
+              "title": "Comprendre les Intentions de Recherche Google",
+              "summary": "Requêtes informationnelles, transactionnelles et navigationnelles.",
+              "content": "Analyse des SERP Google pour identifier ce que Google attend pour chaque requête.",
+              "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+              "durationMinutes": 30,
+              "position": 1,
+              "isFreePreview": true
+            },
+            {
+              "id": "les-2-2",
+              "moduleId": "mod-2",
+              "title": "Cartographie de 50+ Mots-Clés Cibles",
+              "summary": "Utilisation de Google Keyword Planner et AnswerThePublic.",
+              "content": "Extraction des volumes de recherche et construction de la matrice de mots-clés.",
+              "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+              "durationMinutes": 45,
+              "position": 2,
+              "isFreePreview": false
+            },
+            {
+              "id": "les-2-3",
+              "moduleId": "mod-2",
+              "title": "Rédaction d’un Article Optimisé sans Sur-Optimisation",
+              "summary": "Structure Hn, balises Alt, maillage et champ sémantique.",
+              "content": "Méthodologie pas à pas pour rédiger un article captivant qui se positionne durablement.",
+              "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+              "durationMinutes": 50,
+              "position": 3,
+              "isFreePreview": false
+            }
+          ]
+        },
+        {
+          "id": "mod-3",
+          "courseId": "crs-digital-1",
+          "title": "Semaine 03 : Optimisation On-Page & Performance Technique",
+          "description": "Balises SEO, maillage interne, Core Web Vitals et indexation Google.",
+          "position": 3,
+          "lessons": [
+            {
+              "id": "les-3-1",
+              "moduleId": "mod-3",
+              "title": "Audit Technique & Balisage Title / Meta Description",
+              "summary": "Optimisation chirurgicale des métadonnées pour booster le taux de clic.",
+              "content": "Règles d’or pour des balises Title percutantes et des URL propres.",
+              "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+              "durationMinutes": 30,
+              "position": 1,
+              "isFreePreview": false
+            },
+            {
+              "id": "les-3-2",
+              "moduleId": "mod-3",
+              "title": "Vitesse de Chargement & PageSpeed Insights 90+",
+              "summary": "Compression WebP, mise en cache et Core Web Vitals.",
+              "content": "Optimisation de la vitesse de votre site WordPress pour mobile et desktop.",
+              "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+              "durationMinutes": 40,
+              "position": 2,
+              "isFreePreview": false
+            }
+          ]
+        },
+        {
+          "id": "mod-4",
+          "courseId": "crs-digital-1",
+          "title": "Semaine 04 : SEO Local & Google Maps Casablanca",
+          "description": "Fiche Google Business Profile, avis clients et visibilité géolocalisée.",
+          "position": 4,
+          "lessons": [
+            {
+              "id": "les-4-1",
+              "moduleId": "mod-4",
+              "title": "Création et Optimisation Google Business Profile",
+              "summary": "Balisage de la fiche Maps, catégories, horaires et photos.",
+              "content": "Comment apparaître dans le pack local de Google sur les requêtes à Casablanca.",
+              "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+              "durationMinutes": 35,
+              "position": 1,
+              "isFreePreview": false
+            }
+          ]
+        },
+        {
+          "id": "mod-5",
+          "courseId": "crs-digital-1",
+          "title": "Semaine 05 : Analytics GA4, Search Console & Projet Final",
+          "description": "Mesure du trafic réel, suivi des positions et validation du certificat.",
+          "position": 5,
+          "lessons": [
+            {
+              "id": "les-5-1",
+              "moduleId": "mod-5",
+              "title": "Configuration Google Search Console & Suivi de Crawl",
+              "summary": "Soumission du sitemap.xml et analyse des impressions de recherche.",
+              "content": "Interprétation des rapports d’indexation et des performances de recherche.",
+              "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+              "durationMinutes": 40,
+              "position": 1,
+              "isFreePreview": false
+            },
+            {
+              "id": "les-5-2",
+              "moduleId": "mod-5",
+              "title": "Installation Google Analytics 4 & Suivi des Conversions",
+              "summary": "Configuration des événements clés et des objectifs business.",
+              "content": "Mesure précise des visiteurs et du retour sur investissement.",
+              "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+              "durationMinutes": 45,
+              "position": 2,
+              "isFreePreview": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crs-seo-2",
+      "slug": "formation-seo-casablanca",
+      "title": "Formation SEO & Référencement Google Casablanca",
+      "shortDescription": "Maîtrisez les techniques avancées du référencement naturel pour dominer la 1ère page de Google.",
+      "fullDescription": "Programme intensif dédié à la stratégie sémantique, à l’audit technique et au netlinking.",
+      "categoryId": "cat-seo",
+      "categoryName": "SEO & Référencement",
+      "level": "Intermédiaire à Avancé",
+      "durationHours": 30,
+      "priceMAD": 3000,
+      "priceEUR": 280,
+      "rating": 4.9,
+      "reviewCount": 32,
+      "studentCount": 95,
+      "thumbnail": "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=600&q=80",
+      "instructorId": "usr-instructor-1",
+      "instructorName": "Wassim Kassy",
+      "instructorRole": "Consultant SEO",
+      "published": true,
+      "learningOutcomes": [
+        "Audit SEO technique complet",
+        "Cocon sémantique et maillage",
+        "Stratégie de netlinking éthique"
+      ],
+      "prerequisites": [
+        "Connaissances de base du web"
+      ],
+      "createdAt": "2026-09-26T15:45:04.459Z",
+      "updatedAt": "2026-09-26T15:45:04.459Z",
+      "modules": []
+    },
+    {
+      "id": "crs-wp-3",
+      "slug": "formation-wordpress-casablanca",
+      "title": "Formation WordPress & Création Web Casablanca",
+      "shortDescription": "Apprenez à concevoir des sites web professionnels, responsives et rapides avec WordPress.",
+      "fullDescription": "Ateliers 100% pratiques pour maîtriser WordPress, Gutenberg, WooCommerce et la sécurité web.",
+      "categoryId": "cat-wp",
+      "categoryName": "Création de Sites Web",
+      "level": "Débutant",
+      "durationHours": 25,
+      "priceMAD": 2800,
+      "priceEUR": 260,
+      "rating": 4.88,
+      "reviewCount": 26,
+      "studentCount": 88,
+      "thumbnail": "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=600&q=80",
+      "instructorId": "usr-instructor-1",
+      "instructorName": "Wassim Kassy",
+      "instructorRole": "Expert WordPress",
+      "published": true,
+      "learningOutcomes": [
+        "Concevoir un site WordPress de A à Z",
+        "Personnaliser le design",
+        "Sécuriser son site"
+      ],
+      "prerequisites": [
+        "Aucun prérequis en code"
+      ],
+      "createdAt": "2026-09-26T15:45:04.459Z",
+      "updatedAt": "2026-09-26T15:45:04.459Z",
+      "modules": []
+    }
+  ],
+  "enrollments": [
+    {
+      "id": "enr-1",
+      "userId": "usr-student-1",
+      "courseId": "crs-digital-1",
+      "status": "active",
+      "enrolledAt": "2026-09-26T15:45:04.459Z"
+    }
+  ],
+  "progress": [
+    {
+      "id": "prg-1",
+      "userId": "usr-student-1",
+      "lessonId": "les-1-1",
+      "courseId": "crs-digital-1",
+      "completed": true,
+      "progressPercent": 100,
+      "lastWatchedSeconds": 1500,
+      "completedAt": "2026-09-26T15:45:04.459Z",
+      "updatedAt": "2026-09-26T15:49:24.781Z"
+    },
+    {
+      "id": "prg-2",
+      "userId": "usr-student-1",
+      "lessonId": "les-1-2",
+      "courseId": "crs-digital-1",
+      "completed": true,
+      "progressPercent": 100,
+      "lastWatchedSeconds": 2100,
+      "completedAt": "2026-09-26T15:45:04.459Z",
+      "updatedAt": "2026-09-26T15:45:04.459Z"
+    }
+  ],
+  "certificates": [
+    {
+      "id": "cert-1",
+      "certificateNumber": "FSA-2026-0042",
+      "userId": "usr-student-1",
+      "courseId": "crs-digital-1",
+      "studentName": "Karim Mansouri",
+      "courseTitle": "Formation Marketing Digital & SEO Casablanca",
+      "issuedAt": "2026-09-26T15:45:04.459Z",
+      "verificationToken": "vtok_g085c3zy8h",
+      "score": 95
+    }
+  ],
+  "payments": [
+    {
+      "id": "pay-1",
+      "userId": "usr-student-1",
+      "courseId": "crs-digital-1",
+      "amount": 3500,
+      "currency": "MAD",
+      "provider": "CMI_MAROC",
+      "status": "paid",
+      "transactionRef": "TXN-984210",
+      "createdAt": "2026-09-26T15:45:04.459Z"
+    }
+  ],
+  "enquiries": [
+    {
+      "name": "Mohamed Tazi",
+      "email": "gwa.mohamed.tazi@gmail.com",
+      "phone": "+34674050313",
+      "profileType": "student",
+      "goal": "Candidature session",
+      "preferredFormat": "presential",
+      "consent": true,
+      "id": "enq-1790434093993",
+      "createdAt": "2026-09-26T14:48:13.994Z",
+      "status": "new"
+    },
+    {
+      "id": "enq-1",
+      "name": "Youssef El Amrani",
+      "email": "youssef@example.com",
+      "phone": "+212 6 00 00 00 00",
+      "profileType": "entrepreneur",
+      "goal": "Lancer un site e-commerce et être visible sur Casablanca",
+      "preferredFormat": "presentiel_casablanca",
+      "consent": true,
+      "createdAt": "2026-09-25T18:44:19.876Z",
+      "status": "new"
+    }
+  ],
+  "faqs": [
+    {
+      "id": "faq-1",
+      "question": "En quoi cette formation est-elle différente d’un cours classique ?",
+      "answer": "La formation FormaSEO.ma repose sur la pratique concrète. Plutôt que d’écouter de la théorie passive, vous travaillez directement sur la conception, l’optimisation et le référencement de votre propre site web ou projet professionnel.",
+      "category": "Pédagogie"
+    },
+    {
+      "id": "faq-2",
+      "question": "Faut-il savoir coder pour suivre la formation ?",
+      "answer": "Non, aucun prérequis en programmation informatique n’est nécessaire. Nous utilisons WordPress et des outils visuels accessibles pour vous apprendre à bâtir un site professionnel et optimisé de façon autonome.",
+      "category": "Prérequis"
+    },
+    {
+      "id": "faq-3",
+      "question": "La formation a-t-elle lieu en présentiel à Casablanca ou en ligne ?",
+      "answer": "FormaSEO.ma propose des formats adaptés (présentiel à Casablanca dans le secteur Mers Sultan, ou sessions à distance avec accompagnement). Les modalités exactes de la prochaine session sont confirmées lors de votre demande de programme.",
+      "category": "Format",
+      "needsConfirmation": true
+    },
+    {
+      "id": "faq-4",
+      "question": "Que vais-je concrètement obtenir à la fin de la formation ?",
+      "answer": "Vous repartez avec un site WordPress fonctionnel, votre recherche de mots-clés effectuée, vos pages optimisées pour le SEO, votre fiche Google Maps configurée et vos outils de mesure (Search Console, Analytics) connectés.",
+      "category": "Résultats"
+    },
+    {
+      "id": "faq-5",
+      "question": "Quels sont les tarifs et dates de la prochaine session ?",
+      "answer": "Les dates précises, horaires et tarifs de la session à venir vous sont envoyés par email et WhatsApp dès réception de votre formulaire de candidature, afin de vous garantir des informations à jour.",
+      "category": "Inscriptions",
+      "needsConfirmation": true
+    }
+  ],
+  "curriculum": [
+    {
+      "weekNumber": 1,
+      "title": "Fondations Web & Création de votre Site WordPress",
+      "focus": "Mise en place de l’infrastructure et architecture",
+      "topics": [
+        "Comprendre le fonctionnement d’un site web : nom de domaine, hébergement et DNS",
+        "Installation propre de WordPress et configuration des paramètres indispensables",
+        "Choix d’un thème léger et ergonomique adapté aux mobiles",
+        "Création des pages clés : Accueil, Services/Boutique, À Propos, Contact et Mentions Légales",
+        "Sécurisation de base et gestion des extensions indispensables"
+      ],
+      "tools": [
+        "WordPress",
+        "Gutenberg/Constructeur de pages",
+        "Hébergement Web"
+      ],
+      "deliverable": "Votre site web personnel ou professionnel déployé en ligne avec une structure saine.",
+      "confirmationStatus": "proposé"
+    },
+    {
+      "weekNumber": 2,
+      "title": "Recherche de Mots-Clés & Stratégie Éditoriale SEO",
+      "focus": "Identifier les requêtes rentables et structurer son contenu",
+      "topics": [
+        "Comprendre les différentes intentions de recherche (informationnelle, transactionnelle, locale)",
+        "Méthodologie de recherche de mots-clés avec Google Keyword Planner et Google Suggest",
+        "Organisation sémantique des pages et création d’un calendrier éditorial",
+        "Rédaction optimisée pour Google : structure Hn, lisibilité et champ lexical",
+        "Utilisation responsable des assistants IA pour accélérer la rédaction sans pénalité"
+      ],
+      "tools": [
+        "Google Keyword Planner",
+        "AnswerThePublic",
+        "Assistants IA"
+      ],
+      "deliverable": "Cartographie de 50+ mots-clés cibles et publication de votre premier article optimisé.",
+      "confirmationStatus": "proposé"
+    },
+    {
+      "weekNumber": 3,
+      "title": "Optimisation On-Page & Performance Technique",
+      "focus": "Rendre votre site attractif et rapide pour Googlebot",
+      "topics": [
+        "Optimisation chirurgicale des balises Title, Meta Descriptions et URLs",
+        "Balisage des images (attributs ALT, compression, formats modernes WebP)",
+        "Stratégie de maillage interne pour guider les visiteurs et les robots",
+        "Comprendre la vitesse de chargement et tester avec PageSpeed Insights",
+        "Création et soumission du fichier sitemap.xml et du fichier robots.txt"
+      ],
+      "tools": [
+        "PageSpeed Insights",
+        "Extension SEO WordPress (Rank Math / Yoast)",
+        "Sitemap XML"
+      ],
+      "deliverable": "Audit technique et optimisation complète des pages stratégiques de votre site.",
+      "confirmationStatus": "proposé"
+    },
+    {
+      "weekNumber": 4,
+      "title": "SEO Local & Visibilité Multi-Canale",
+      "focus": "Dominer les recherches géolocalisées et développer sa présence",
+      "topics": [
+        "Création et optimisation complète de votre fiche Google Business Profile (Google Maps)",
+        "Techniques pour capter les requêtes locales à Casablanca et dans les villes marocaines",
+        "Gestion des avis clients, e-réputation et citations locales (NAP)",
+        "Création de visuels simples et professionnels avec Canva pour valoriser son contenu",
+        "Synergie entre SEO et réseaux sociaux pour générer des signaux d’engagement"
+      ],
+      "tools": [
+        "Google Business Profile",
+        "Canva",
+        "Google Maps"
+      ],
+      "deliverable": "Fiche Google Maps configurée et plan d’action de visibilité locale activé.",
+      "confirmationStatus": "proposé"
+    },
+    {
+      "weekNumber": 5,
+      "title": "Analytics, Mesure des Résultats & Projet Final",
+      "focus": "Analyser son trafic réel et valider ses livrables",
+      "topics": [
+        "Connexion et configuration de Google Search Console pour suivre les impressions et clics",
+        "Installation de Google Analytics 4 (GA4) et suivi des actions clés des utilisateurs",
+        "Interpréter les données : quelles pages performent et comment itérer",
+        "Revue individuelle et audit croisé de votre projet de site",
+        "Plan d’action d’optimisation continue sur les 3 prochains mois"
+      ],
+      "tools": [
+        "Google Search Console",
+        "Google Analytics 4",
+        "Rapports SEO"
+      ],
+      "deliverable": "Projet final complet : site en ligne, optimisé, suivi sur Search Console et GA4.",
+      "confirmationStatus": "proposé"
+    }
+  ],
   "settings": {
     "name": "FormaSEO.ma",
     "domain": "formaseo.ma",
@@ -115,162 +645,5 @@
         "notes": "Remplacement des maquettes par les vrais retours d’expérience"
       }
     ]
-  },
-  "curriculum": [
-    {
-      "weekNumber": 1,
-      "title": "Fondations Web & Création de votre Site WordPress",
-      "focus": "Mise en place de l’infrastructure et architecture",
-      "topics": [
-        "Comprendre le fonctionnement d’un site web : nom de domaine, hébergement et DNS",
-        "Installation propre de WordPress et configuration des paramètres indispensables",
-        "Choix d’un thème léger et ergonomique adapté aux mobiles",
-        "Création des pages clés : Accueil, Services/Boutique, À Propos, Contact et Mentions Légales",
-        "Sécurisation de base et gestion des extensions indispensables"
-      ],
-      "tools": [
-        "WordPress",
-        "Gutenberg/Constructeur de pages",
-        "Hébergement Web"
-      ],
-      "deliverable": "Votre site web personnel ou professionnel déployé en ligne avec une structure saine.",
-      "confirmationStatus": "proposé"
-    },
-    {
-      "weekNumber": 2,
-      "title": "Recherche de Mots-Clés & Stratégie Éditoriale SEO",
-      "focus": "Identifier les requêtes rentables et structurer son contenu",
-      "topics": [
-        "Comprendre les différentes intentions de recherche (informationnelle, transactionnelle, locale)",
-        "Méthodologie de recherche de mots-clés avec Google Keyword Planner et Google Suggest",
-        "Organisation sémantique des pages et création d’un calendrier éditorial",
-        "Rédaction optimisée pour Google : structure Hn, lisibilité et champ lexical",
-        "Utilisation responsable des assistants IA pour accélérer la rédaction sans pénalité"
-      ],
-      "tools": [
-        "Google Keyword Planner",
-        "AnswerThePublic",
-        "Assistants IA"
-      ],
-      "deliverable": "Cartographie de 50+ mots-clés cibles et publication de votre premier article optimisé.",
-      "confirmationStatus": "proposé"
-    },
-    {
-      "weekNumber": 3,
-      "title": "Optimisation On-Page & Performance Technique",
-      "focus": "Rendre votre site attractif et rapide pour Googlebot",
-      "topics": [
-        "Optimisation chirurgicale des balises Title, Meta Descriptions et URLs",
-        "Balisage des images (attributs ALT, compression, formats modernes WebP)",
-        "Stratégie de maillage interne pour guider les visiteurs et les robots",
-        "Comprendre la vitesse de chargement et tester avec PageSpeed Insights",
-        "Création et soumission du fichier sitemap.xml et du fichier robots.txt"
-      ],
-      "tools": [
-        "PageSpeed Insights",
-        "Extension SEO WordPress (Rank Math / Yoast)",
-        "Sitemap XML"
-      ],
-      "deliverable": "Audit technique et optimisation complète des pages stratégiques de votre site.",
-      "confirmationStatus": "proposé"
-    },
-    {
-      "weekNumber": 4,
-      "title": "SEO Local & Visibilité Multi-Canale",
-      "focus": "Dominer les recherches géolocalisées et développer sa présence",
-      "topics": [
-        "Création et optimisation complète de votre fiche Google Business Profile (Google Maps)",
-        "Techniques pour capter les requêtes locales à Casablanca et dans les villes marocaines",
-        "Gestion des avis clients, e-réputation et citations locales (NAP)",
-        "Création de visuels simples et professionnels avec Canva pour valoriser son contenu",
-        "Synergie entre SEO et réseaux sociaux pour générer des signaux d’engagement"
-      ],
-      "tools": [
-        "Google Business Profile",
-        "Canva",
-        "Google Maps"
-      ],
-      "deliverable": "Fiche Google Maps configurée et plan d’action de visibilité locale activé.",
-      "confirmationStatus": "proposé"
-    },
-    {
-      "weekNumber": 5,
-      "title": "Analytics, Mesure des Résultats & Projet Final",
-      "focus": "Analyser son trafic réel et valider ses livrables",
-      "topics": [
-        "Connexion et configuration de Google Search Console pour suivre les impressions et clics",
-        "Installation de Google Analytics 4 (GA4) et suivi des actions clés des utilisateurs",
-        "Interpréter les données : quelles pages performent et comment itérer",
-        "Revue individuelle et audit croisé de votre projet de site",
-        "Plan d’action d’optimisation continue sur les 3 prochains mois"
-      ],
-      "tools": [
-        "Google Search Console",
-        "Google Analytics 4",
-        "Rapports SEO"
-      ],
-      "deliverable": "Projet final complet : site en ligne, optimisé, suivi sur Search Console et GA4.",
-      "confirmationStatus": "proposé"
-    }
-  ],
-  "faqs": [
-    {
-      "id": "faq-1",
-      "question": "En quoi cette formation est-elle différente d’un cours classique ?",
-      "answer": "La formation FormaSEO.ma repose sur la pratique concrète. Plutôt que d’écouter de la théorie passive, vous travaillez directement sur la conception, l’optimisation et le référencement de votre propre site web ou projet professionnel.",
-      "category": "Pédagogie"
-    },
-    {
-      "id": "faq-2",
-      "question": "Faut-il savoir coder pour suivre la formation ?",
-      "answer": "Non, aucun prérequis en programmation informatique n’est nécessaire. Nous utilisons WordPress et des outils visuels accessibles pour vous apprendre à bâtir un site professionnel et optimisé de façon autonome.",
-      "category": "Prérequis"
-    },
-    {
-      "id": "faq-3",
-      "question": "La formation a-t-elle lieu en présentiel à Casablanca ou en ligne ?",
-      "answer": "FormaSEO.ma propose des formats adaptés (présentiel à Casablanca dans le secteur Mers Sultan, ou sessions à distance avec accompagnement). Les modalités exactes de la prochaine session sont confirmées lors de votre demande de programme.",
-      "category": "Format",
-      "needsConfirmation": true
-    },
-    {
-      "id": "faq-4",
-      "question": "Que vais-je concrètement obtenir à la fin de la formation ?",
-      "answer": "Vous repartez avec un site WordPress fonctionnel, votre recherche de mots-clés effectuée, vos pages optimisées pour le SEO, votre fiche Google Maps configurée et vos outils de mesure (Search Console, Analytics) connectés.",
-      "category": "Résultats"
-    },
-    {
-      "id": "faq-5",
-      "question": "Quels sont les tarifs et dates de la prochaine session ?",
-      "answer": "Les dates précises, horaires et tarifs de la session à venir vous sont envoyés par email et WhatsApp dès réception de votre formulaire de candidature, afin de vous garantir des informations à jour.",
-      "category": "Inscriptions",
-      "needsConfirmation": true
-    }
-  ],
-  "enquiries": [
-    {
-      "name": "Mohamed Tazi",
-      "email": "gwa.mohamed.tazi@gmail.com",
-      "phone": "+34674050313",
-      "profileType": "student",
-      "goal": "Candidature session",
-      "preferredFormat": "presential",
-      "consent": true,
-      "id": "enq-1790434093993",
-      "createdAt": "2026-09-26T14:48:13.994Z",
-      "status": "new"
-    },
-    {
-      "id": "enq-1",
-      "name": "Youssef El Amrani",
-      "email": "youssef@example.com",
-      "phone": "+212 6 00 00 00 00",
-      "profileType": "entrepreneur",
-      "goal": "Lancer un site e-commerce et être visible sur Casablanca",
-      "preferredFormat": "presentiel_casablanca",
-      "consent": true,
-      "createdAt": "2026-09-25T18:44:19.876Z",
-      "status": "new"
-    }
-  ]
+  }
 }
